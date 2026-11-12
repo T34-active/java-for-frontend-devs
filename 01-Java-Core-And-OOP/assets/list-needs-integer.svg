@@ -4,21 +4,73 @@
   <desc id="desc">List 格子存对象引用，可放 Integer，不能放裸 int；add(1) 时先自动装箱。</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#1d4ed8"/>
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--c-blue-deep)"/>
     </marker>
-    <style><![CDATA[
-      .title { font: 700 15px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
-      .node-text { font: 600 13px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
-      .ok { font: 600 13px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #047857; }
-      .bad { font: 600 13px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #be123c; }
-      .cell { fill: #eff6ff; stroke: #2563eb; stroke-width: 2; }
-      .step { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 1.5; }
+    <style><![CDATA[:root {
+  color-scheme: light dark;
+  --c-text: #0f172a;
+  --c-muted: #334155;
+  --c-soft: #475569;
+  --c-hint: #64748b;
+  --c-null-stroke: #94a3b8;
+  --c-panel: #f8fafc;
+  --c-null-fill: #f1f5f9;
+  --c-panel-stroke: #e2e8f0;
+  --c-step-stroke: #cbd5e1;
+  --c-teal-fill: #ecfdf5;
+  --c-teal: #0f766e;
+  --c-ok: #047857;
+  --c-orange-fill: #fff7ed;
+  --c-orange: #c2410c;
+  --c-orange-mid: #ea580c;
+  --c-rose-fill: #fff1f2;
+  --c-rose: #e11d48;
+  --c-bad: #be123c;
+  --c-blue-fill: #eff6ff;
+  --c-blue: #2563eb;
+  --c-blue-deep: #1d4ed8;
+  --c-amber-fill: #fffbeb;
+  --c-amber: #d97706;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-text: #e2e8f0;
+    --c-muted: #cbd5e1;
+    --c-soft: #94a3b8;
+    --c-hint: #94a3b8;
+    --c-null-stroke: #64748b;
+    --c-panel: #1e293b;
+    --c-null-fill: #334155;
+    --c-panel-stroke: #334155;
+    --c-step-stroke: #475569;
+    --c-teal-fill: #134e4a;
+    --c-teal: #2dd4bf;
+    --c-ok: #34d399;
+    --c-orange-fill: #7c2d12;
+    --c-orange: #fb923c;
+    --c-orange-mid: #fb923c;
+    --c-rose-fill: #881337;
+    --c-rose: #fb7185;
+    --c-bad: #fb7185;
+    --c-blue-fill: #1e3a8a;
+    --c-blue: #60a5fa;
+    --c-blue-deep: #60a5fa;
+    --c-amber-fill: #78350f;
+    --c-amber: #fbbf24;
+  }
+}
+.title { font: 700 15px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: var(--c-text); }
+      .node-text { font: 600 13px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: var(--c-text); }
+      .ok { font: 600 13px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: var(--c-ok); }
+      .bad { font: 600 13px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: var(--c-bad); }
+      .cell { fill: var(--c-blue-fill); stroke: var(--c-blue); stroke-width: 2; }
+      .step { fill: var(--c-panel); stroke: var(--c-step-stroke); stroke-width: 1.5; }
     ]]></style>
   </defs>
   <text class="title" x="24" y="32">集合为何只要包装类型</text>
   <rect class="step" x="24" y="52" width="672" height="44" rx="8"/>
   <text class="node-text" x="40" y="80">1. List 内部 ≈ 对象引用数组（格子里放的是箭头，不是裸 int 比特）</text>
-  <line x1="360" y1="96" x2="360" y2="118" stroke="#1d4ed8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="360" y1="96" x2="360" y2="118" stroke="var(--c-blue-deep)" stroke-width="2" marker-end="url(#arrow)"/>
   <rect class="cell" x="120" y="124" width="72" height="56" rx="6"/>
   <rect class="cell" x="200" y="124" width="72" height="56" rx="6"/>
   <rect class="cell" x="280" y="124" width="72" height="56" rx="6"/>
@@ -27,10 +79,10 @@
   <text class="node-text" x="298" y="158">引用</text>
   <text class="ok" x="380" y="148">可指向 Integer</text>
   <text class="bad" x="380" y="172">放不进裸 int</text>
-  <line x1="360" y1="180" x2="360" y2="202" stroke="#1d4ed8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="360" y1="180" x2="360" y2="202" stroke="var(--c-blue-deep)" stroke-width="2" marker-end="url(#arrow)"/>
   <rect class="step" x="24" y="206" width="672" height="44" rx="8"/>
   <text class="node-text" x="40" y="234">2. int 不是 Object 子类型 → 不能写 List&lt;int&gt;</text>
-  <line x1="360" y1="250" x2="360" y2="272" stroke="#1d4ed8" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="360" y1="250" x2="360" y2="272" stroke="var(--c-blue-deep)" stroke-width="2" marker-end="url(#arrow)"/>
   <rect class="step" x="24" y="276" width="672" height="44" rx="8"/>
   <text class="node-text" x="40" y="304">3. 正确：List&lt;Integer&gt;；add(1) 时先 Integer.valueOf(1) 再放入引用</text>
 </svg>

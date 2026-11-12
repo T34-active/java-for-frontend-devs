@@ -1,16 +1,18 @@
 # 1. 强类型与基础语法
 
-本章讨论 Java 如何用**类型**约束程序，以及你每天都会用到的**基础语句**：变量、基本类型与包装类型、转换与分支循环、相等比较、`final`、数组与列表、方法，以及空值与字符串。
+本章讨论 Java 如何用 <Term id="strong-typing" strong /> 约束程序，以及你每天都会用到的基础语句：变量、<Term id="primitive" /> 与 <Term id="wrapper" />、转换与分支循环、相等比较、<Term id="final" />、数组与列表、方法与 <Term id="value-passing" />，以及空值与字符串。
 
-本章不是词条词典。六个知识要点按因果排列：先解决「为什么要类型、程序从哪开始」，再解决「值怎么存放」，然后才能「把语句串起来」「判断相等」「约束引用与组织代码」，最后处理「空」和文本。
+本章不是词条词典。七个知识要点按因果排列：先解决「为什么要类型、程序从哪开始」，再解决「值怎么存放」，然后才能「把语句串起来」「判断相等」「约束引用与组织代码」，再弄清「方法传参到底传什么」，最后处理「空」和文本。带点状下划线的词可点开释义，汇总见 [术语表](./glossary.md)。
 
 还没装好 JDK 17？先回 [00 · 安装 JDK 与工具链](./00-install-jdk-and-toolchain.md)。  
 对应代码：[`StrongTypingDemo.java`](./src/main/java/com/jffd/core/typing/StrongTypingDemo.java)
 
+深度与考点对齐吸收自 [JavaGuide · 值传递](https://javaguide.cn/java/basis/why-there-only-value-passing-in-java.html)、[BigDecimal](https://javaguide.cn/java/basis/bigdecimal.html) 等篇，已按本仓库 MDN 六段式重写（Apache-2.0）。
+
 | | |
 |--|--|
 | 前置 | 第 0 章已通过；会写 TypeScript 的变量、函数、`if`/`for`。 |
-| 学完应能 | 解释强类型解决什么问题；读懂 `main` 与变量声明；区分 `int`/`Integer` 并说明为何不能 `List<int>`；会做类型转换与 `if`/`for`；正确使用 `==`/`equals`、`final`；处理空引用与金额精度。 |
+| 学完应能 | 解释强类型解决什么问题；读懂 `main` 与变量声明；区分 `int`/`Integer` 并说明为何不能 `List<int>`；会做类型转换与 `if`/`for`；正确使用 `==`/`equals`、`final`；说明 Java 只有值传递；处理空引用与金额精度。 |
 
 ---
 
@@ -22,7 +24,7 @@
 
 如果你在宽松的 JavaScript 里写错类型，常常要等到运行、甚至等到某个分支被点到才爆炸。前端用 TypeScript，本质就是把一部分错误提前到编译期。
 
-Java 的**强类型**（更准确说：静态强类型）做的是同一类事，而且更彻底：每个变量、参数、返回值在编译期都有确定类型；对不上就会**编译失败**，字节码都不会生成。没有它，后端这种「接口一多、调用链一长」的代码会把类型错误拖到联调甚至生产才发现。
+Java 的强类型**（更准确说：静态强类型）做的是同一类事，而且更彻底：每个变量、参数、返回值在编译期都有确定类型；对不上就会**编译失败**，字节码都不会生成。没有它，后端这种「接口一多、调用链一长」的代码会把类型错误拖到联调甚至生产才发现。
 
 核心定位：
 
@@ -217,16 +219,16 @@ public static void main(String[] args) { }
 
 Java 不允许这样糊成一锅。它把值分成三族：
 
-1. **基本类型**（primitive）：8 种纯值，槽位里直接是比特，**不能为 null**，也没有方法。  
-2. **引用类型**（reference）：变量里只存**箭头（引用）**，指向堆上的对象；箭头可以是 `null`。`String`、数组、你自己写的类、`List` 都属于这一族。  
-3. **包装类型**（wrapper）：JDK 为每种基本类型配的**类**（如 `Integer`）。它本身是引用类型，但专门用来「把一个基本类型的值包成对象」。
+1. <Term id="primitive" strong />（primitive）：8 种纯值，槽位里直接是比特，**不能为 null**，也没有方法。  
+2. <Term id="reference-type" strong />（reference）：变量里只存**箭头（引用）**，指向堆上的对象；箭头可以是 `null`。`String`、数组、你自己写的类、`List` 都属于这一族。  
+3. <Term id="wrapper" strong />（wrapper）：JDK 为每种基本类型配的**类**（如 `Integer`）。它本身是引用类型，但专门用来「把一个基本类型的值包成对象」。
 
 没有这套区分会怎样？
 
 - 集合（`List` / `Map`）格子里只能放对象引用 → 裸 `int` 塞不进去。  
 - 数据库 / JSON 里「这个字段没值」需要 `null` → 基本类型表达不了，只能发明 `-1` 这种魔法数。
 
-核心定位：本地计数、循环、算数用基本类型；文本、对象、集合用引用类型；「可空的数字 / 布尔」以及放进 `List` 时用包装类型。两族数字之间靠**装箱 / 拆箱**自动转换。
+核心定位：本地计数、循环、算数用基本类型；文本、对象、集合用引用类型；「可空的数字 / 布尔」以及放进 `List` 时用包装类型。两族数字之间靠 <Term id="boxing" strong /> / <Term id="unboxing" strong /> 自动转换。
 
 ### 2. 底层心智模型 (Mental Model)
 
@@ -451,9 +453,9 @@ System.out.println(b + "," + s + "," + f + "," + c);
 
 #### 连接器：装箱与拆箱
 
-- **装箱**：基本类型 → 包装类型（编译器常自动做）。  
-- **拆箱**：包装类型 → 基本类型（编译器常自动做）。  
-- 对 `null` 拆箱 → `NullPointerException`。
+- <Term id="boxing" strong />：基本类型 → 包装类型（编译器常自动做）。  
+- <Term id="unboxing" strong />：包装类型 → 基本类型（编译器常自动做）。  
+- 对 `null` 拆箱 → <Term id="npe" />（`NullPointerException`）。
 
 ```java
 int raw = 42;
@@ -1004,7 +1006,7 @@ Integer p = 128, q = 128; // 通常 false
 
 数组像「创建时定长的格子」；`List` 像「可伸缩的动态数组 API」。业务列表绝大多数时候用 `List`。
 
-方法（method）把重复逻辑收起来；**重载**允许同名不同参数列表。`var` 仅用于局部变量类型推断，让右边类型明显时少写左边。
+方法（method）把重复逻辑收起来；**重载允许同名不同参数列表。`var` 仅用于局部变量类型推断，让右边类型明显时少写左边。
 
 没有它们：要么满屏魔法数与可变绑定，要么到处复制粘贴循环，代码无法维护。
 
@@ -1190,17 +1192,176 @@ List<String> list = List.of("x", "y");
 
 ---
 
-最后一块是后端每天踩坑最多的区域：引用为「空」时会发生什么，以及文本与金额该如何安全处理。
+方法会写了，但前端读者常卡在一句口号：「Java 到底是值传递还是引用传递？」下一节把这句话钉死——否则你会误以为 `swap` 两个对象引用能换掉调用方手里的变量。
 
-## 知识要点六：空引用、`Optional`、`String` 与金额
+## 知识要点六：方法参数只有<Term id="value-passing" strong />
 
 ### 1. 概述 (Overview)
 
-Java 的引用可以是 `null`，表示「没有对象」。对 `null` 调用方法、拆箱、取字段，都会得到 **`NullPointerException`（NPE）**——这是后端日志里的常客。
+TypeScript / JavaScript 里传对象，很多人说「引用传递」：函数里改对象字段，外面看得见。这容易让人以为「传对象 = 把变量本身交出去」。
 
-`Optional<T>` 用来在**返回值**上显式表达「可能没有」，逼调用方处理空情况。它不是用来当实体字段类型到处传的。
+Java 的规则更干脆：只有 <Term id="value-passing" strong />。
 
-`String` 是不可变字符序列：任何「修改」通常产生新对象。金额则不要用 `double`，而用 `BigDecimal`。
+- 传基本类型：拷贝的是**值本身**。  
+- 传引用类型：拷贝的是**引用（箭头）的副本**。形参与实参起初指向同一对象，所以改字段外面看得见；但给形参**重新赋值**，不会改掉调用方变量。
+
+没有这套区分，你会写出「以为换了两个 User，其实外面一个都没换」的 bug，也会在面试里被一句「那为什么改字段有效」问懵。
+
+核心定位：方法永远收到副本；改共享对象的状态可见，重绑形参不可见。
+
+### 2. 底层心智模型 (Mental Model)
+
+![Java 方法参数只有值传递](./assets/value-passing.svg)
+
+读图：
+
+1. `bump(n)`：形参 `a` 拿到 `10` 的拷贝，`a++` 不碰外面的 `n`。  
+2. `rename(u)`：形参拿到与 `u` 相同的箭头副本；`param.name = ...` 改的是堆上同一对象。  
+3. `param = new User()` 只让形参换箭头，调用方的 `u` 仍指向旧对象。
+
+### 3. 语法与核心 API 签名 (Syntax & Parameters)
+
+```java
+void bump(int a) { a = a + 1; }           // 改的是 a 的副本
+void touch(User u) { u.setName("Ada"); }  // 改的是共享对象
+void rebind(User u) { u = new User("x"); } // 只改形参箭头
+```
+
+| 术语 | 含义 |
+|------|------|
+| 实参 | 调用处传入的表达式（必须已有确定值） |
+| 形参 | 方法定义上的参数槽，接收实参副本 |
+| 值传递 | 方法收到的是拷贝，不是调用方变量本身 |
+
+### 4. 渐进式示例 (Examples)
+
+#### 示例 1：最小可运行原型
+
+```java
+public class ValuePassProto {
+    static class User {
+        String name;
+        User(String name) { this.name = name; }
+    }
+
+    public static void main(String[] args) {
+        int n = 10;
+        bump(n);
+        System.out.println("n=" + n);
+
+        User u = new User("Bob");
+        touch(u);
+        System.out.println("after touch: " + u.name);
+        rebind(u);
+        System.out.println("after rebind: " + u.name);
+    }
+
+    static void bump(int a) { a = 99; }
+
+    static void touch(User u) { u.name = "Ada"; }
+
+    static void rebind(User u) { u = new User("Carol"); }
+}
+```
+
+```text
+// 控制台输出：
+n=10
+after touch: Ada
+after rebind: Ada
+```
+
+逐行执行逻辑：
+
+1. `bump` 把形参改成 99，实参 `n` 仍是 10。  
+2. `touch` 通过引用副本改对象字段，外面看到 `Ada`。  
+3. `rebind` 让形参指向新对象，外面的 `u` 仍指向改过名字的那个，所以还是 `Ada`。
+
+#### 示例 2：真实业务——「清空订单行」传 List
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class ClearLines {
+    public static void main(String[] args) {
+        List<String> lines = new ArrayList<>();
+        lines.add("sku-1");
+        clearWrong(lines);
+        System.out.println("after wrong clear size=" + lines.size());
+        clearRight(lines);
+        System.out.println("after right clear size=" + lines.size());
+    }
+
+    static void clearWrong(List<String> lines) {
+        lines = new ArrayList<>(); // 只换了形参箭头
+    }
+
+    static void clearRight(List<String> lines) {
+        lines.clear(); // 改共享对象
+    }
+}
+```
+
+```text
+// 控制台输出：
+after wrong clear size=1
+after right clear size=0
+```
+
+逐行执行逻辑：
+
+1. `clearWrong` 把形参绑到新空列表，调用方仍拿着旧列表。  
+2. `clearRight` 调用对象方法清空同一列表，外面 size 变为 0。
+
+### 5. 常见错误与避坑指南 (Common Pitfalls)
+
+#### 错误写法：以为 swap 两个引用能换掉调用方变量
+
+```java example-bad
+static void swap(User a, User b) {
+    User t = a; a = b; b = t; // 只交换了形参副本
+}
+```
+
+#### 正确写法
+
+```java example-good
+// 若业务真要交换，返回新结果或改对象内部字段，而不是指望重绑形参
+```
+
+根因：形参里的箭头是副本；交换副本不影响实参变量。
+
+---
+
+#### 错误写法：把「能改对象字段」说成「引用传递」
+
+能改字段只说明两边指向同一对象，不等于语言提供了引用传递。
+
+### 6. 前端 vs Java 快速对照表 (Comparison)
+
+| 维度 | TypeScript | Java |
+|------|------------|------|
+| 传 `number` | 拷贝值 | 拷贝值 |
+| 传对象 | 传引用；重绑形参也不影响外层绑定 | 传引用的**副本**（仍叫值传递） |
+| 改对象字段 | 外面可见 | 外面可见 |
+| 形参 = 新对象 | 不影响外层变量 | 不影响外层变量 |
+
+---
+
+弄清传参之后，还剩后端每天踩坑最多的区域：引用为「空」时会发生什么，以及文本与金额该如何安全处理。
+
+## 知识要点七：空引用、`Optional`、`String` 与金额
+
+### 1. 概述 (Overview)
+
+Java 的引用可以是 `null`，表示「没有对象」。对 `null` 调用方法、拆箱、取字段，都会得到 <Term id="npe" text="NullPointerException（NPE）" strong />——这是后端日志里的常客。
+
+<Term id="optional" /> 用来在**返回值**上显式表达「可能没有」，逼调用方处理空情况。它不是用来当实体字段类型到处传的。
+
+`String` 是不可变字符序列：内容放进对象后不能改；`s.toUpperCase()` 之类会返回**新**字符串。字面量可能进入常量池，所以有时 <Term id="double-equals" /> 碰巧为 true——那是优化，不是业务约定，比较内容仍用 <Term id="equals" />。
+
+金额不要用 `double`：二进制浮点算不准「角分」。用 <Term id="bigdecimal" />，并且用**字符串**构造；`new BigDecimal(0.1)` 会把 `double` 的误差原样固化进去。
 
 没有这些约定：NPE、字符串 `==` 假绿、账目差一分钱，会同时出现。
 
@@ -1376,7 +1537,8 @@ new BigDecimal(0.1); // 会把 double 的误差原样固化进去
 4. `Boolean flag = null; if (flag)` 为什么炸？  
 5. 何时用 `==`，何时用 `equals` / `Objects.equals`？  
 6. `final List` 为何还能 `add`？真正冻内容用什么？  
-7. 为什么金额不能 `double`，也不建议 `new BigDecimal(0.1)`？
+7. Java 为什么说「只有值传递」？改对象字段为什么外面又能看见？  
+8. 为什么金额不能 `double`，也不建议 `new BigDecimal(0.1)`？
 
 ---
 
@@ -1388,14 +1550,25 @@ new BigDecimal(0.1); // 会把 double 的误差原样固化进去
 mvn -pl 01-Java-Core-And-OOP compile exec:java "-Dexec.mainClass=com.jffd.core.typing.StrongTypingDemo"
 ```
 
-2. 对照输出中的 `[cast]` / `[for]` / `[Integer cache]` / `[String]` / `[BigDecimal]`。  
+2. 对照输出中的 `[cast]` / `[for]` / `[Integer cache]` / `[value-pass]` / `[String]` / `[BigDecimal]`。  
 3. 取消拆箱 NPE 那一行注释，只看堆栈第一帧属于哪次调用。  
-4. 把文档里「示例 1」抄进临时类跑通，再改成「示例 2」的结构。
+4. 把文档里「值传递」示例 1 抄进临时类跑通，再改成清空 List 的示例 2。
+
+---
+
+## 面试（可选）
+
+- Java 只有值传递？传对象时发生了什么？  
+- `String` 为什么不可变？常量池能否当作 `==` 的业务依据？  
+- 金额为什么不用 `double`？`new BigDecimal(0.1)` 有什么问题？  
+- `Integer` 缓存范围与 `==` 的关系？
+
+参考：[JavaGuide · 值传递](https://javaguide.cn/java/basis/why-there-only-value-passing-in-java.html)、[BigDecimal](https://javaguide.cn/java/basis/bigdecimal.html)、[Java 基础常见题](https://javaguide.cn/java/basis/java-basic-questions-01.html)
 
 ---
 
 ## 小结
 
-六个知识要点连成一条因果链：强类型与程序骨架 → 值如何存放（基本/引用/包装）→ 转换与控制流 → 相等语义 → 约束与结构（`final`/数组/`List`/方法）→ 空值、字符串与金额。下一章在这个地基上讲类、接口与多态。
+七个知识要点连成一条因果链：强类型与程序骨架 → 值如何存放（基本/引用/包装）→ 转换与控制流 → 相等语义 → 约束与结构（`final`/数组/`List`/方法）→ 方法只有值传递 → 空值、字符串与金额。下一章在这个地基上讲类、接口与多态。
 
 下一章 → [02-oop-deep-dive.md](./02-oop-deep-dive.md)

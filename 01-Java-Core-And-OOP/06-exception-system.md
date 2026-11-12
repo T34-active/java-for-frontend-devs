@@ -1,13 +1,15 @@
 # 6. 异常体系
 
-本章讨论 Java 异常分类、`try/catch/finally` 与 try-with-resources、自定义业务异常、NPE 的常见来源，以及生产中如何保留 cause、如何记日志。文末预告异常与事务回滚的关系。
+本章讨论 Java 异常分类、`try/catch/finally` 与 <Term id="twr" />、自定义业务异常、<Term id="npe" /> 的常见来源，以及生产中如何保留 <Term id="cause" />、如何记日志。文末预告异常与事务回滚的关系。带点状下划线的词可点开释义，见 [术语表](./glossary.md)。
 
 对应代码：[`ExceptionDemo.java`](./src/main/java/com/jffd/core/exception/ExceptionDemo.java)、[`BizException.java`](./src/main/java/com/jffd/core/exception/BizException.java)
+
+分类与生产用法对齐吸收自 [JavaGuide · Java 基础常见题](https://javaguide.cn/java/basis/java-basic-questions-01.html) 等篇，已按本仓库节奏重写（Apache-2.0）。
 
 | | |
 |--|--|
 | 前置 | 第 1 章的 NPE / 拆箱；会写方法与 `try` 的基本直觉。 |
-| 学完应能 | 区分受检 / 非受检；写 try-with-resources；设计带 code 的 `BizException` 并保留 cause；列出常见 NPE 场景。 |
+| 学完应能 | 说明受检设计动机并区分受检 / 非受检；写 try-with-resources；设计带 code 的 `BizException` 并保留 cause；列出常见 NPE 场景。 |
 
 下面从异常继承树讲起，一次只加一层概念。
 
@@ -21,8 +23,8 @@
 
 ### 受检异常与非受检异常
 
-- **受检异常（checked）**：编译器要求你要么 `catch`，要么在方法签名上 `throws`。  
-- **非受检异常（unchecked）**：`RuntimeException` 及其子类；编译器不强制处理。  
+- <Term id="checked-exception" strong />（checked）：编译器要求你要么 `catch`，要么在方法签名上 `throws`。  
+- <Term id="unchecked-exception" strong />（unchecked）：`RuntimeException` 及其子类；编译器不强制处理。  
 - **`Error`**：表示严重问题，程序往往已难以继续；不要当成普通业务分支去抓。
 
 | 类型 | 编译器 | 例子 | 常见策略 |
@@ -31,7 +33,7 @@
 | `RuntimeException` | 不强制 | NPE、自定义 `BizException` | 业务失败的主流选择 |
 | `Error` | 别随便抓 | OOM | 记录监控；进程可能已不健康 |
 
-现代业务代码里，自定义业务异常通常继承 `RuntimeException`，避免每个方法签名都被 `throws` 淹没。
+设计动机（人话）：受检异常想逼你在编译期正视「这件事可能失败」（读写文件、网络）。代价是签名传染——一层 `throws` 会顺着调用链往上冒。现代业务代码里，领域失败（余额不足、无权限）通常继承 **`RuntimeException`**，在边界统一转换成 HTTP / 错误码；IO / SQL 等受检异常则在基础设施边界 catch，**包装时传入 cause**，避免把根因栈吃掉。
 
 ---
 
@@ -220,12 +222,15 @@ mvn -pl 01-Java-Core-And-OOP exec:java -Dexec.mainClass="com.jffd.core.exception
 
 ## 面试（可选）
 
-- 受检 vs 非受检？  
+- 受检 vs 非受检？业务异常为何常选 RuntimeException？  
 - `final` / `finally` / `finalize` 别混淆  
 - try-with-resources 的大致原理？  
+- 包装异常时为什么必须传 cause？  
 - NPE 常见原因与防范？  
 - 事务在哪些情况下可能不回滚？  
 - 为什么不要把异常当普通控制流？
+
+参考：[JavaGuide · Java 基础常见题](https://javaguide.cn/java/basis/java-basic-questions-01.html)
 
 ## 小结
 
@@ -238,11 +243,14 @@ mvn -pl 01-Java-Core-And-OOP exec:java -Dexec.mainClass="com.jffd.core.exception
 对照 Learn 式「Core 学完应能」，跑过第 0 章与各章 Demo 后勾选：
 
 - [ ] 说清基本类型 / 包装类型、装箱拆箱与 NPE  
+- [ ] 说明 Java 只有值传递（改字段可见 ≠ 引用传递）  
 - [ ] 说清 `==` / `equals`，并正确使用 `final`  
-- [ ] 用接口 + 组合表达策略，而不是深继承  
-- [ ] 知道 `ArrayList` / `HashMap` 的基本代价、CME、可变 key  
-- [ ] 理解泛型擦除与 PECS  
-- [ ] 用 Stream 做 filter / map / groupingBy，并知道并行禁区  
+- [ ] 用接口 + 组合表达策略，而不是深继承；说清 `equals`/`hashCode` 契约  
+- [ ] 知道 `ArrayList` 扩容、`HashMap` 桶/树化直觉、CME、可变 key、`Arrays.asList` 坑  
+- [ ] 理解泛型擦除、PECS，以及 JSON/`TypeReference` 为何要补信息  
+- [ ] 用 Stream 做 filter / map / groupingBy，说清惰性与并行禁区  
 - [ ] 设计 `BizException` 并保留 cause  
+
+深度参考：[JavaGuide](https://github.com/Snailclimb/JavaGuide)（本模块已按 MDN 台阶重写吸收，非原文搬运）。
 
 然后回 [全书路线图](/guide)。准备好了就说「继续模块二」。

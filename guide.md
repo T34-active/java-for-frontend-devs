@@ -33,7 +33,7 @@
 每一个独立知识点（不是整章糊成一段，也不是拆成十几条碎节）都必须按此顺序写满，不得缺段、不得把对照表提前抢戏：
 
 1. **概述 (Overview)** — 大白话说明「为什么需要它」；没有它会遇到什么麻烦；再给核心定位。可用精确的前端类比帮助迁移，但类比不能替代 Java 自己的定义。  
-2. **底层心智模型 (Mental Model)** — 内存 / 引用 / 对象关系用 **SVG 图**展示（放各章 `assets/`，Markdown 用 `![说明](./assets/xxx.svg)` 嵌入）；流程因果可再配简短分步文字。禁止再用大段框线 ASCII 充当主图。  
+2. **底层心智模型 (Mental Model)** — 内存 / 引用 / 对象关系用 **SVG 图**展示（放各章 `assets/`，Markdown 用 `![说明](./assets/xxx.svg)` 嵌入）；流程因果可再配简短分步文字。禁止再用大段框线 ASCII 充当主图。SVG 必须适配亮/暗主题：颜色走 CSS 变量 + `@media (prefers-color-scheme: dark)`；新增或重写图后跑 `assets/_patch_svg_dark.py`（或生成脚本末尾自动打补丁）。站点侧靠 `.vitepress/theme/custom.css` 给 `<img>` 设 `color-scheme`，使 VitePress 手动切黑夜时图也能跟着变。  
 3. **语法与核心 API 签名 (Syntax & Parameters)** — 列出标准写法；逐词解释关键字、参数、返回值、修饰符（如 `public` / `static` / `final` / `<T>`）在此处的作用。  
 4. **渐进式示例 (Examples)** — 示例 1 最小可运行原型；示例 2 贴近后端真实场景；每个代码块下方必须有 `// 控制台输出：` 与逐行执行说明。  
 5. **常见错误与避坑指南 (Common Pitfalls)** — 2～3 组 `❌` / `✅`，并解释编译错误或异常的根因。  
@@ -46,6 +46,26 @@
 3. **先模型后语法再示例**：心智模型讲清后，再给签名与代码。  
 4. **深水区外链**：擦除、源码细节链到专章或「备注」，本章不提前卸载。  
 5. **Test your skills ≠ 面试题堆砌**：自测先检验「学完应能」；面试题可附在后作可选。
+
+### 参考 JavaGuide 的融合约定
+
+深度与常见考点可参考开源项目 [JavaGuide](https://github.com/Snailclimb/JavaGuide)（[在线阅读](https://javaguide.cn)，Apache-2.0）。融合时遵守：
+
+1. **受众不变**：仍是「前端转 Java」的 Learn 台阶，不是把本仓库改成面试百科。  
+2. **用自己的话重写**：吸收机制结论与易错点，改写成 MDN 六段式知识要点；禁止整段原文搬运。  
+3. **署名**：章首或章末「参考」写明对应 JavaGuide 篇目链接。  
+4. **深水区外链**：反射、动态代理、完整源码逐行、并发容器等放「备注 + 外链」，不塞进 Core 主台阶。  
+5. **面试节可选**：章末「面试（可选）」可增补精选问法并回链 JavaGuide；自测清单仍先检验「学完应能」。
+
+### 行内术语（点按释义）
+
+模块一文中带点状下划线的词可点开短释义（交互类似「高性价比人生指南」里的 CI 提示）。
+
+1. 词条写在 `.vitepress/theme/glossary/module1.ts`；正文用 `<Term id="boxing" />`，或 `<Term id="boxing" text="自动装箱" />`。  
+2. **不要**把 `<Term>` 包进行内代码反引号，否则只会当纯文本显示。  
+3. **不要**写 `**<Term id="x" />**` 或 `*<Term />*`：Markdown 的加粗/斜体包不住 Vue 组件，页面上会露出 `**`。需要加粗时写 `<Term id="x" strong />`。  
+4. 每章首次出现的关键术语再标记即可，不必全文刷屏。  
+5. 汇总页：[模块一 · 术语表](/01-Java-Core-And-OOP/glossary)。
 
 ### 排版与 `**` 用法（对齐 [zh-CN translation-guide](file:///D:/ateng/MDN/translated-content/docs/zh-cn/translation-guide.md) + MDN Markdown）
 

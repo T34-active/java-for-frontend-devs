@@ -26,3 +26,7 @@ application-local.properties
 
 # Local PR draft (do not commit)
 /.github/pr-body-temp.md
+
+# Python
+__pycache__/
+*.pyc

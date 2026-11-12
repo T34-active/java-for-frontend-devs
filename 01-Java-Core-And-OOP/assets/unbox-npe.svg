@@ -4,25 +4,77 @@
   <desc id="desc">拆箱时编译器插入 intValue，missing 为 null 则抛出 NullPointerException。</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#be123c"/>
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--c-bad)"/>
     </marker>
-    <style><![CDATA[
-      .title { font: 700 15px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
-      .code { font: 600 13px ui-monospace, Consolas, monospace; fill: #334155; }
-      .node-text { font: 600 13px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
-      .node { fill: #fff1f2; stroke: #e11d48; stroke-width: 2; }
-      .node-mid { fill: #fff7ed; stroke: #ea580c; stroke-width: 2; }
-      .node-start { fill: #f8fafc; stroke: #64748b; stroke-width: 2; }
+    <style><![CDATA[:root {
+  color-scheme: light dark;
+  --c-text: #0f172a;
+  --c-muted: #334155;
+  --c-soft: #475569;
+  --c-hint: #64748b;
+  --c-null-stroke: #94a3b8;
+  --c-panel: #f8fafc;
+  --c-null-fill: #f1f5f9;
+  --c-panel-stroke: #e2e8f0;
+  --c-step-stroke: #cbd5e1;
+  --c-teal-fill: #ecfdf5;
+  --c-teal: #0f766e;
+  --c-ok: #047857;
+  --c-orange-fill: #fff7ed;
+  --c-orange: #c2410c;
+  --c-orange-mid: #ea580c;
+  --c-rose-fill: #fff1f2;
+  --c-rose: #e11d48;
+  --c-bad: #be123c;
+  --c-blue-fill: #eff6ff;
+  --c-blue: #2563eb;
+  --c-blue-deep: #1d4ed8;
+  --c-amber-fill: #fffbeb;
+  --c-amber: #d97706;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-text: #e2e8f0;
+    --c-muted: #cbd5e1;
+    --c-soft: #94a3b8;
+    --c-hint: #94a3b8;
+    --c-null-stroke: #64748b;
+    --c-panel: #1e293b;
+    --c-null-fill: #334155;
+    --c-panel-stroke: #334155;
+    --c-step-stroke: #475569;
+    --c-teal-fill: #134e4a;
+    --c-teal: #2dd4bf;
+    --c-ok: #34d399;
+    --c-orange-fill: #7c2d12;
+    --c-orange: #fb923c;
+    --c-orange-mid: #fb923c;
+    --c-rose-fill: #881337;
+    --c-rose: #fb7185;
+    --c-bad: #fb7185;
+    --c-blue-fill: #1e3a8a;
+    --c-blue: #60a5fa;
+    --c-blue-deep: #60a5fa;
+    --c-amber-fill: #78350f;
+    --c-amber: #fbbf24;
+  }
+}
+.title { font: 700 15px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: var(--c-text); }
+      .code { font: 600 13px ui-monospace, Consolas, monospace; fill: var(--c-muted); }
+      .node-text { font: 600 13px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: var(--c-text); }
+      .node { fill: var(--c-rose-fill); stroke: var(--c-rose); stroke-width: 2; }
+      .node-mid { fill: var(--c-orange-fill); stroke: var(--c-orange-mid); stroke-width: 2; }
+      .node-start { fill: var(--c-panel); stroke: var(--c-hint); stroke-width: 2; }
     ]]></style>
   </defs>
   <text class="title" x="24" y="32">拆箱时若引用是 null</text>
   <text class="code" x="24" y="56">int raw = missing;</text>
   <rect class="node-start" x="160" y="76" width="400" height="48" rx="8"/>
   <text class="node-text" x="220" y="106">源码：int raw = missing</text>
-  <line x1="360" y1="124" x2="360" y2="152" stroke="#be123c" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="360" y1="124" x2="360" y2="152" stroke="var(--c-bad)" stroke-width="2.5" marker-end="url(#arrow)"/>
   <rect class="node-mid" x="160" y="154" width="400" height="48" rx="8"/>
   <text class="node-text" x="200" y="184">编译器插入 missing.intValue()</text>
-  <line x1="360" y1="202" x2="360" y2="230" stroke="#be123c" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="360" y1="202" x2="360" y2="230" stroke="var(--c-bad)" stroke-width="2.5" marker-end="url(#arrow)"/>
   <rect class="node" x="80" y="232" width="560" height="48" rx="8"/>
-  <text class="node-text" x="120" y="262" fill="#be123c">missing 为 null → 调用实例方法 → NullPointerException</text>
+  <text class="node-text" x="120" y="262" fill="var(--c-bad)">missing 为 null → 调用实例方法 → NullPointerException</text>
 </svg>
