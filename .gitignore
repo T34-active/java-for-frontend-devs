@@ -23,3 +23,6 @@ docs/
 *.pem
 application-local.yml
 application-local.properties
+
+# Local PR draft (do not commit)
+/.github/pr-body-temp.md

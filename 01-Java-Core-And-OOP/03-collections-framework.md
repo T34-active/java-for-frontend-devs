@@ -1,133 +1,109 @@
-# 3. 集合框架（源码级心智）
+# 3. 集合框架
 
-> 先搞清选哪种集合、复杂度、fail-fast、HashMap 契约，再跑 Demo。  
-> 对应：[`CollectionsDemo.java`](./src/main/java/com/jffd/core/collections/CollectionsDemo.java)
+本章讨论 Java 集合框架：`List`、`Set`、`Queue`、`Map` 的接口关系，常用实现如何选型，以及遍历时的 fail-fast、不可变集合和 `Map.get` 的 null 歧义。
 
----
+对应代码：[`CollectionsDemo.java`](./src/main/java/com/jffd/core/collections/CollectionsDemo.java)
 
-## 把 JS 的 Array/Map/Set 映射过来
+| | |
+|--|--|
+| 前置 | 第 1–2 章：引用类型、`equals`/`hashCode`、为何是 `List<Integer>`。 |
+| 学完应能 | 画出 Collection / Map 族谱；默认选用 `ArrayList`/`HashMap`；解释 fail-fast 与可变 key；空集合不返回 null。 |
 
-| 你熟的 | Java 常用 | 备注 |
-|--------|-----------|------|
-| `Array` | `List` / `ArrayList` | 业务第一公民 |
-| `Set` | `HashSet` / `LinkedHashSet` | 去重 |
-| `Map` / 对象当字典 | `HashMap` / `LinkedHashMap` | 键可以是任意对象 |
-| 队列 / 栈 | `ArrayDeque` | 别用古老的 `Stack` 类 |
-| 不可变快照 | `List.of` / `Map.of` | 有点像运行时的 `as const` |
-
-升级点：Java 的 Map 键依赖 `hashCode`/`equals`，不是只有字符串或引用两种简单情况。
+下面从接口族谱开始，按顺序读。
 
 ---
 
-## 3.1 接口族谱
+## 3.1 集合接口族谱
 
-```text
-Iterable
-└── Collection
-    ├── List     有序、下标、可重复
-    ├── Set      不重复（是否有序看实现）
-    └── Queue    排队、双端等
+Java 集合主要分两支：`Collection`（List / Set / Queue）与独立的 `Map`。
 
-Map              独立体系（不是 Collection）
-```
+![集合接口族谱](./assets/collection-hierarchy.svg)
 
-尽量依赖接口类型：
+写变量类型时，尽量依赖接口，而不是写死实现类：
 
 ```java
 List<String> list = new ArrayList<>();
 Map<String, Integer> map = new HashMap<>();
 ```
 
-别到处把参数写成死的 `ArrayList`——跟前端「依赖 Props 接口而不是某个组件类」一个道理。
-
-日常够用：`ArrayList`、`HashMap`、`HashSet`、`ArrayDeque`；并发再加 `ConcurrentHashMap`（模块二）。
+日常最常用：`ArrayList`、`HashMap`、`HashSet`、`ArrayDeque`。并发场景下的 `ConcurrentHashMap` 放在模块二。
 
 ---
 
-## 3.2 ArrayList：读源码抓什么
+## 3.2 `List` 与 `ArrayList`
 
-底层就是可扩容数组：
+**`List`** 是有序列表接口。业务里最常见的实现是 **`ArrayList`**：底层是可扩容的数组。
 
-```text
-Object[] elementData
-int size
+![ArrayList 底层结构](./assets/arraylist-structure.svg)
+
+```java
+List<String> list = new ArrayList<>();
+list.add("a");
+list.add("b");
+String first = list.get(0);
 ```
 
-| 操作 | 复杂度 | 前端直觉 |
-|------|--------|----------|
-| 尾部 `add` | 摊还 O(1) | `push` |
-| 中间 `add/remove` | O(n) | `splice` 搬移 |
-| `get(i)` | O(1) | 下标访问 |
-| `contains` | O(n) | `includes` 扫一遍 |
+操作代价（量级直觉）：
 
-容量不够时，常见实现大约扩到 1.5 倍，再 `arraycopy`。已知规模就预分配：
+| 操作 | 大致复杂度 | 说明 |
+|------|------------|------|
+| 尾部 `add` | 摊还 O(1) | 偶尔扩容会拷贝数组 |
+| 中间 `add` / `remove` | O(n) | 需要搬移元素 |
+| `get(i)` | O(1) | 按下标访问 |
+| `contains` | O(n) | 通常要扫描 |
+
+已知大概规模时，可以预分配容量，减少扩容：
 
 ```java
 List<String> list = new ArrayList<>(256);
 ```
 
-### 为啥业务几乎不用 LinkedList
+### 为什么业务很少用 `LinkedList`
 
-教材爱考链表头插 O(1)。现实是：CPU 更吃连续数组，节点对象开销大，真要队列语义多用 `ArrayDeque`。  
-面试可以说 LinkedList 特点，写业务默认 ArrayList。
+链表在「头尾插入」上理论好看，但节点分散、缓存不友好，对象头开销也大。真正要队列语义时，更常用 `ArrayDeque`。面试可以说清 `LinkedList` 特点；写业务默认 `ArrayList`。
 
 ---
 
-## 3.3 HashMap（必考，也容易出事）
+## 3.3 `Map` 与 `HashMap`
 
-### 结构（JDK 8+）
-
-```text
-Node<K,V>[] table
-每个桶：链表；太长且容量够大 → 红黑树
-```
-
-流程：算 hash → 落到桶 → 桶内用 `equals` 找同 key → 元素太多超过「负载因子 0.75 × 容量」就扩容到约 2 倍。  
-树化经验值（面试常背）：链表长度 ≥ 8 且数组长度 ≥ 64 时树化。
-
-### API
+**`Map`** 保存键到值的映射。最常用的实现是 **`HashMap`**。
 
 ```java
 Map<String, Integer> stars = new HashMap<>();
 stars.put("react", 220_000);
 stars.putIfAbsent("vue", 1);
 int v = stars.getOrDefault("angular", 0);
-stars.forEach((k, val) -> { /* ... */ });
 ```
 
-| 点 | JS | Java HashMap |
-|----|----|--------------|
-| 键类型 | 对象引用或字符串为主 | 任意对象，靠 hashCode/equals |
-| null key | `Map` 可以 | 允许一个 null key |
-| 遍历时删 | 看情况诡异 | 乱删 → `ConcurrentModificationException` |
+### 结构直觉（JDK 8+）
 
-### 可变 key 陷阱
+![HashMap 桶与查找](./assets/hashmap-buckets.svg)
 
-```text
-1. 可变对象当 key put 进去
-2. 改了参与 hashCode/equals 的字段
-3. get 时算到别的桶 → 变成 null
-4. 旧 entry 其实还在（containsValue 可能仍 true）
-```
+放入或查找时大致步骤：计算 hash → 落到某个桶 → 在桶内用 `equals` 判断是不是同一个键。元素过多、超过「负载因子 × 容量」（默认负载因子 0.75）时扩容。
 
-跟「对象当 Map key 然后改对象内容」一个坑。key 用不可变类型：`String`、`Long`、`record`、枚举。
+面试常背的经验值：链表长度 ≥ 8 且数组长度 ≥ 64 时可能树化。先建立心智即可，不必死记实现细节。
 
+### 键的要求
+
+`HashMap` 的键可以是任意对象，但键的相等性依赖 `hashCode` 与 `equals`。因此：
+
+- 用作键的类应正确实现这两者。  
+- 键放入后，不要再修改参与 `hashCode`/`equals` 的字段。
+
+可变键的典型事故：
+
+![可变键导致 HashMap 丢失](./assets/mutable-key-pitfall.svg)
+
+键优先使用不可变类型：`String`、`Long`、`record`、枚举等。
 ### 线程安全
 
-`HashMap` 不是线程安全的。多线程写可能丢数据；老 JDK 还有死链传说。  
-并发用 `ConcurrentHashMap`。`Collections.synchronizedMap` 是粗粒度锁，现代一般不首选。
+`HashMap` **不是**线程安全的。多线程同时写入可能丢数据或出现更糟的情况。并发场景用 `ConcurrentHashMap`（模块二）。
 
 ---
 
-## 3.4 其他常用选型
+## 3.4 `Set` 与其他常用实现
 
-| 类型 | 特征 | 什么时候用 |
-|------|------|------------|
-| `LinkedHashMap` | 保持插入序（可配访问序） | 要顺序的 Map；简易 LRU |
-| `TreeMap` | 按键排序 | 有序键 / 范围查询 |
-| `HashSet` | 内部是 HashMap 的 key | 去重 |
-| `LinkedHashSet` | 去重且保插入序 | 唯一 + 顺序 |
-| `ArrayDeque` | 双端队列 | 队列、栈 |
+**`Set`** 表示不重复元素的集合。`HashSet` 内部通常借助 `HashMap` 的键来实现去重。
 
 ```java
 Set<String> tags = new HashSet<>();
@@ -135,24 +111,32 @@ tags.add("java");
 tags.add("java"); // size 仍为 1
 ```
 
+| 类型 | 特征 | 典型用途 |
+|------|------|----------|
+| `LinkedHashMap` | 保持插入序（可配置为访问序） | 需要顺序的 Map；简易 LRU |
+| `TreeMap` | 按键排序 | 有序键、范围查询 |
+| `HashSet` | 去重 | 唯一集合 |
+| `LinkedHashSet` | 去重且保持插入序 | 唯一且要顺序 |
+| `ArrayDeque` | 双端队列 | 队列、栈（不要用过时的 `Stack` 类） |
+
 ---
 
 ## 3.5 遍历与 fail-fast
 
+在用增强 for 遍历时，如果直接对底层集合做结构性修改（例如 `list.remove`），常会抛出 **`ConcurrentModificationException`（CME）**。这叫 **fail-fast**：尽快失败，避免静默错乱。
+
 ```java
 List<String> list = new ArrayList<>(List.of("a", "b", "c"));
 
-// enhanced for 里结构性删除 → ConcurrentModificationException
+// 错误示范：增强 for 里结构性删除
 // for (String s : list) {
 //     if (s.equals("b")) list.remove(s);
 // }
 
-list.removeIf(s -> s.equals("b"));
+list.removeIf(s -> s.equals("b")); // 推荐
 ```
 
-fail-fast：迭代期间结构被改，立刻抛 CME，避免默默错下去。  
-前端 `forEach` 里改数组有时还能「看起来能跑」；Java 选择直接报错——这是好事。  
-`iterator.remove()` 也安全；`removeIf` 更现代。
+也可以使用迭代器自己的 `remove()`。现代代码优先 `removeIf`。
 
 ---
 
@@ -163,59 +147,65 @@ List<String> freeze = List.of("x", "y");
 Map<String, Integer> m = Map.of("a", 1);
 ```
 
-- 「没有数据」返回 `List.of()` / `emptyList()`，别返回 null。  
-- 需要防外部修改时，返回不可变副本或不可变视图。  
-- `subList` 是视图：改原列表会影响子列表，别当独立拷贝。
+- 「没有数据」时返回 `List.of()` 或 `Collections.emptyList()`，不要返回 `null`。  
+- 需要防止调用方修改时，返回不可变集合或不可变副本。  
+- `subList` 是**视图**：改原列表会影响子列表，不要把它当成独立深拷贝。
 
 ---
 
-## 3.7 `get` 得到 null 的歧义
+## 3.7 `Map.get` 得到 `null` 的歧义
 
 ```java
 Integer v = map.get(k);
-// null 可能是：没有这个键，或值就是 null
+// null 可能表示：没有这个键，或值本身就是 null
 ```
 
-处理：`containsKey`、`getOrDefault`、禁止 null value，或用 Optional 包一层（看团队习惯）。
+处理方式包括：`containsKey`、`getOrDefault`、禁止存 null 值，或按团队约定使用 `Optional`。
 
 ---
 
-## 3.8 先自测
+## 检验一下
 
-1. 为啥业务默认 ArrayList 不是 LinkedList？  
-2. HashMap 何时扩容？树化大致条件？  
-3. 为啥重写 equals 的对象才能当好 Map key？  
-4. CME 何时出现？正确删除姿势？  
-5. 接口返回空列表为啥比返回 null 好？
+1. 为什么业务默认用 `ArrayList` 而不是 `LinkedList`？  
+2. `HashMap` 何时扩容？树化的大致条件是什么？  
+3. 为什么用作 Map 键的类需要正确的 `equals`/`hashCode`？  
+4. CME 通常在什么情况下出现？正确删除方式是什么？  
+5. 接口返回空列表为什么比返回 `null` 更好？
 
 ---
 
-## 3.9 动手
+## 动手
+
+1. 运行：
 
 ```bash
 mvn -pl 01-Java-Core-And-OOP exec:java -Dexec.mainClass="com.jffd.core.collections.CollectionsDemo"
 ```
 
-重点看最后的 mutable key：改 key 后 `get` 变 null，但 `containsValue` 仍 true。
+2. 重点观察末尾可变 key：修改 key 后 `get` 变为 null，但 `containsValue` 仍可能为 true。
 
 ---
 
 ## 避坑
 
-1. 大列表频繁 `contains` / 中间插入  
-2. 并发用 HashMap  
+1. 大列表频繁 `contains`，或频繁在中间插入  
+2. 多线程共用 `HashMap` 写入  
 3. 可变对象当 key  
-4. foreach 里直接 `list.remove`  
-5. `map.get` 的 null 歧义  
-6. 把 `subList` 当深拷贝返回  
+4. 增强 for 里直接 `list.remove`  
+5. 忽略 `map.get` 的 null 歧义  
+6. 把 `subList` 当深拷贝返回
 
-## 面试
+## 面试（可选）
 
-- ArrayList 与 LinkedList？扩容？  
-- HashMap 结构、put、扩容、树化？  
-- HashMap 与 ConcurrentHashMap？  
+- `ArrayList` 与 `LinkedList`？扩容？  
+- `HashMap` 结构、`put`、扩容、树化？  
+- `HashMap` 与 `ConcurrentHashMap`？  
 - fail-fast 与 fail-safe？  
-- hashCode / equals 如何影响 HashMap？  
-- 如何实现 LRU？（LinkedHashMap accessOrder）
+- `hashCode` / `equals` 如何影响 `HashMap`？  
+- 如何用 `LinkedHashMap` 实现简易 LRU？
+
+## 小结
+
+你已经能按接口选型集合，并知道 `HashMap` 依赖键的相等契约、遍历时不要乱改结构。下一章解释 `List<String>` 这种尖括号在编译期和运行期分别意味着什么。
 
 下一章 → [04-generics.md](./04-generics.md)

@@ -1,39 +1,55 @@
 # 模块一 · Java 核心与 OOP
 
-> **前端一句话**：先装好 JDK 17（≈ 装 Node LTS），再把 TypeScript `strict: true` 拧紧一档——值类型 / 引用类型在运行时真有区别，也没有「对象字面量随便塞字段」的自由。
+本模块对应 Learn 课程里的 **Getting started + Core**：先把 JDK 跑通，再按顺序学类型、面向对象、集合、泛型、Stream 与异常。
+
+写法对齐 [MDN Learn](https://developer.mozilla.org/zh-CN/docs/Learn_web_development) 的课程序列与文章骨架（前置 → 学完应能 → 台阶正文 → 检验 / 动手 → 小结）。全书约定见 [guide.md](/guide)。本地对照源码目录：`D:\ateng\MDN\content\files\en-us\learn_web_development`。
+
+目标不是「一次变成专家」，而是 **从不会到够用**——学完后能读进阶资料、能跑 Demo、能解释核心概念。
 
 ## 怎么读
 
-0. **还没装 Java？** 先读第 0 章，把 `java -version` 变成 17，再编译本模块。  
-1. 再把后续章节 Markdown 读完（含自测），类比和坑点吃透。  
-2. 打开对应 `*Demo.java`，或 `mvn exec:java` 跑一遍。  
-3. 章末「避坑 / 面试」扫一眼就行，先别死磕源码细节。
+0. 还没装 Java？从第 0 章开始。  
+1. 按下面教程顺序读；写过多年前端也不要跳台阶。  
+2. 每章先对照「学完应能」与「检验一下」，再跑 Demo。  
+3. 「避坑 / 面试」放在概念之后，最后扫。
 
-本模块对应仓库第一步交付内容。读完你应能：
+## 教程与挑战（按顺序）
 
-- 本机 JDK 17 + Maven 可用，并能跑通模块一 Demo
-- 用 Java 写出带泛型的集合处理代码（≈ 熟练的 TS `Array`/`Map`）
-- 理解 `equals`/`hashCode`、接口与抽象类的选型（≈ 类型系统 + 设计取舍）
-- 用 Stream 做数据管道（≈ `map/filter/reduce`，但有惰性与并行差异）
-- 正确处理受检异常与 NPE（≈ 比 TS 更「强迫你处理失败路径」）
+### Getting started
 
----
+- [0. 安装 JDK 与工具链](./00-install-jdk-and-toolchain.md)  
+  - : 装好 JDK 17 与 Maven，编译并跑通第一个 Demo。
 
-## 章节导航
+### Core
 
-| # | 章节 | 建议耗时 | 示例主类 |
-|---|------|----------|----------|
-| 0 | [安装 JDK 与工具链](./00-install-jdk-and-toolchain.md) | 0.5~1h | （环境验收 + 可选 Hello） |
-| 1 | [强类型与基础语法](./01-strong-typing-and-basics.md) | 1.5h | `com.jffd.core.typing.StrongTypingDemo` |
-| 2 | [面向对象深挖](./02-oop-deep-dive.md) | 2h | `com.jffd.core.oop.OopDemo` |
-| 3 | [集合框架](./03-collections-framework.md) | 2.5h | `com.jffd.core.collections.CollectionsDemo` |
-| 4 | [泛型](./04-generics.md) | 1.5h | `com.jffd.core.generics.GenericsDemo` |
-| 5 | [Stream 与 Lambda](./05-stream-and-lambda.md) | 2h | `com.jffd.core.stream.StreamDemo` |
-| 6 | [异常体系](./06-exception-system.md) | 1.5h | `com.jffd.core.exception.ExceptionDemo` |
+- [1. 强类型与基础语法](./01-strong-typing-and-basics.md)  
+  - : 六个知识要点（各含 MDN 六段式）：强类型与变量 → 基本/包装类型 → 转换与控制流 → 相等比较 → `final`/集合/方法 → 空值与 `String`。  
+- [2. 面向对象深挖](./02-oop-deep-dive.md)  
+  - : 封装、组合与接口、多态、`equals`/`hashCode`、`record`。  
+- [3. 集合框架](./03-collections-framework.md)  
+  - : `List`/`Set`/`Map` 选型、`HashMap` 契约、fail-fast。  
+- [4. 泛型](./04-generics.md)  
+  - : 泛型声明、PECS、类型擦除与限制。  
+- [5. Stream 与 Lambda](./05-stream-and-lambda.md)  
+  - : 函数式接口、惰性管道、`collect`、并行边界。  
+- [6. 异常体系](./06-exception-system.md)  
+  - : 受检/非受检、try-with-resources、业务异常与 cause。
 
-源码根目录：`01-Java-Core-And-OOP/src/main/java/com/jffd/core/`（在 IDE 中打开；各章文首有对应 `*Demo.java` 链接）
+源码根目录：`01-Java-Core-And-OOP/src/main/java/com/jffd/core/`（各章文首有对应 `*Demo.java`）
 
----
+| # | 建议耗时 | 示例主类 |
+|---|----------|----------|
+| 0 | 0.5~1h | （环境验收） |
+| 1 | 2.5~3.5h | `com.jffd.core.typing.StrongTypingDemo` |
+| 2 | 2h | `com.jffd.core.oop.OopDemo` |
+| 3 | 2~2.5h | `com.jffd.core.collections.CollectionsDemo` |
+| 4 | 1.5h | `com.jffd.core.generics.GenericsDemo` |
+| 5 | 2h | `com.jffd.core.stream.StreamDemo` |
+| 6 | 1.5h | `com.jffd.core.exception.ExceptionDemo` |
+
+## 检验进度
+
+学完 Core 后，应能勾选第 6 章文末的「模块一收官」清单。卡住某章时，回到该章「前置」与「学完应能」，不要靠前端类比硬跳。
 
 ## 快速运行
 
@@ -54,24 +70,15 @@ mvn -pl 01-Java-Core-And-OOP exec:java \
   -Dexec.mainClass="com.jffd.core.typing.StrongTypingDemo"
 ```
 
-Windows PowerShell 同一条命令即可（注意引号）。
-
----
-
-## TS → Java 切换清单（贴显示器）
+## 迁移提示（辅线，读完对应章再看）
 
 | 你习惯的 | Java 里要改成 |
 |----------|----------------|
-| 装 Node LTS | 装 **JDK 17**（不是 JRE，不是 8） |
-| `nvm use 18` | 调 `JAVA_HOME` + PATH，让 `java`/`mvn` 都指向 17 |
-| `let x: number` | `int x` 或 `Integer x`（装箱有成本与 NPE） |
-| `const` | `final`（引用不可变，≠ 深不可变） |
-| `interface` 可有可选字段 | Java `interface` 是行为契约；数据用 `record`/`class` |
-| 结构类型（鸭子类型） | **名义类型**：必须显式 `implements` / 继承 |
-| `===` | 引用用 `==`；内容相等用 `equals`（大坑） |
-| `undefined` / 缺字段 | 基本没有；只有 `null`，且基本类型不能为 null |
-| `any` / 断言糊弄过去 | 编译期拦住；反射/原始类型才能「逃逸」 |
-| `async/await` 单线程 | 真正的多线程（模块二）；这里先建立「阻塞调用」直觉 |
-| `npm i lodash` | 优先标准库；第三方进 `pom.xml` |
+| 装 Node LTS | 装 **JDK 17** |
+| `let x: number` | 先分清 `int` 与 `Integer`（见第 1 章） |
+| `const` | `final`（只锁引用） |
+| 结构类型 | 名义类型：显式 `implements` |
+| `===` | 引用用 `==`；内容用 `equals` |
+| `any` | 编译期拦住；别靠断言糊弄 |
 
 下一章 → [00-install-jdk-and-toolchain.md](./00-install-jdk-and-toolchain.md)

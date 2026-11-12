@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 440" role="img" aria-labelledby="title desc">
+  <title id="title">从源码到运行的类型检查流水线</title>
+  <desc id="desc">源码经编译类型检查，失败则无程序；通过后生成字节码，JVM 从 main 入口执行。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <style><![CDATA[
+      .title { font: 700 15px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
+      .node-text { font: 600 13px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
+      .side { font: 600 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #be123c; }
+      .ok { font: 600 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #047857; }
+      .node { fill: #f8fafc; stroke: #64748b; stroke-width: 2; }
+      .check { fill: #ecfdf5; stroke: #0f766e; stroke-width: 2; }
+      .fail { fill: #fff1f2; stroke: #e11d48; stroke-width: 2; }
+    ]]></style>
+  </defs>
+  <text class="title" x="24" y="32">写代码 → 运行（强类型卡在编译期）</text>
+  <rect class="node" x="200" y="52" width="320" height="40" rx="8"/>
+  <text class="node-text" x="280" y="78">你写下源码 .java</text>
+  <line x1="360" y1="92" x2="360" y2="118" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect class="check" x="200" y="120" width="320" height="40" rx="8"/>
+  <text class="node-text" x="240" y="146">javac / Maven 编译 · 类型检查</text>
+  <line x1="520" y1="140" x2="560" y2="140" stroke="#e11d48" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect class="fail" x="560" y="120" width="140" height="40" rx="8"/>
+  <text class="side" x="575" y="146">失败 → 无程序</text>
+  <text class="ok" x="372" y="178">通过</text>
+  <line x1="360" y1="160" x2="360" y2="198" stroke="#047857" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect class="node" x="200" y="200" width="320" height="40" rx="8"/>
+  <text class="node-text" x="280" y="226">生成 .class 字节码</text>
+  <line x1="360" y1="240" x2="360" y2="268" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect class="node" x="200" y="270" width="320" height="40" rx="8"/>
+  <text class="node-text" x="290" y="296">java 启动 JVM</text>
+  <line x1="360" y1="310" x2="360" y2="338" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect class="node" x="160" y="340" width="400" height="40" rx="8"/>
+  <text class="node-text" x="200" y="366">找到 public static void main(String[] args)</text>
+  <line x1="360" y1="380" x2="360" y2="400" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <text class="node-text" x="250" y="420">按顺序执行方法体里的语句</text>
+</svg>

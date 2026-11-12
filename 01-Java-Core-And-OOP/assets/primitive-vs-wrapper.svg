@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 520" role="img" aria-labelledby="title desc">
+  <title id="title">基本类型、包装类型与 null 引用</title>
+  <desc id="desc">对比 int 槽位直接存值、Integer 引用指向堆对象、以及 null 不指向任何对象。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/>
+    </marker>
+    <style><![CDATA[
+      .title { font: 700 16px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
+      .code { font: 600 13px ui-monospace, Consolas, monospace; fill: #334155; }
+      .label { font: 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #475569; }
+      .box-text { font: 600 14px ui-monospace, Consolas, monospace; fill: #0f172a; }
+      .hint { font: 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #64748b; }
+      .panel { fill: #f8fafc; stroke: #e2e8f0; stroke-width: 1.5; }
+      .slot { fill: #ecfdf5; stroke: #0f766e; stroke-width: 2; }
+      .obj { fill: #fff7ed; stroke: #c2410c; stroke-width: 2; }
+      .null-slot { fill: #f1f5f9; stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 6 4; }
+    ]]></style>
+  </defs>
+  <rect class="panel" x="16" y="16" width="688" height="140" rx="12"/>
+  <text class="title" x="36" y="44">【基本类型】</text>
+  <text class="code" x="36" y="72">int count = 42;</text>
+  <rect class="slot" x="36" y="92" width="120" height="44" rx="8"/>
+  <text class="box-text" x="76" y="120">42</text>
+  <text class="hint" x="172" y="120">槽位里就是比特值本身（不是对象）</text>
+  <rect class="panel" x="16" y="172" width="688" height="170" rx="12"/>
+  <text class="title" x="36" y="200">【引用类型 / 包装类型】</text>
+  <text class="code" x="36" y="228">Integer boxed = 42;  // 自动装箱 ≈ Integer.valueOf(42)</text>
+  <rect class="slot" x="36" y="252" width="120" height="56" rx="8"/>
+  <text class="box-text" x="62" y="286">引用</text>
+  <line x1="156" y1="280" x2="280" y2="280" stroke="#0f766e" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <rect class="obj" x="290" y="244" width="200" height="72" rx="8"/>
+  <text class="box-text" x="318" y="274">Integer 对象</text>
+  <text class="label" x="318" y="298">内部值 = 42</text>
+  <text class="hint" x="510" y="280">堆上的对象</text>
+  <rect class="panel" x="16" y="358" width="688" height="142" rx="12"/>
+  <text class="title" x="36" y="386">【空引用】</text>
+  <text class="code" x="36" y="414">Integer missing = null;</text>
+  <rect class="null-slot" x="36" y="434" width="120" height="44" rx="8"/>
+  <text class="box-text" x="66" y="462">null</text>
+  <text class="hint" x="172" y="462">没有箭头，不指向任何对象</text>
+</svg>

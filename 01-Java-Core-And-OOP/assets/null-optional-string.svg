@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" role="img">
+  <title>NPE、Optional 与 String 不可变</title>
+  
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrow-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1d4ed8"/>
+    </marker>
+    <marker id="arrow-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#be123c"/>
+    </marker>
+    <style><![CDATA[
+      .title { font: 700 15px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
+      .sub { font: 600 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #64748b; }
+      .node-text { font: 600 13px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
+      .code { font: 600 12px ui-monospace, Consolas, monospace; fill: #334155; }
+      .ok { font: 600 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #047857; }
+      .bad { font: 600 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #be123c; }
+      .panel { fill: #f8fafc; stroke: #e2e8f0; stroke-width: 1.5; }
+      .box { fill: #f8fafc; stroke: #64748b; stroke-width: 2; }
+      .box-teal { fill: #ecfdf5; stroke: #0f766e; stroke-width: 2; }
+      .box-orange { fill: #fff7ed; stroke: #c2410c; stroke-width: 2; }
+      .box-blue { fill: #eff6ff; stroke: #2563eb; stroke-width: 2; }
+      .box-rose { fill: #fff1f2; stroke: #e11d48; stroke-width: 2; }
+      .box-amber { fill: #fffbeb; stroke: #d97706; stroke-width: 2; }
+    ]]></style>
+  </defs>
+
+  <text class="title" x="24" y="28">空引用 · Optional · String 不可变</text>
+
+  <rect class="panel" x="16" y="48" width="240" height="160" rx="10"/>
+  <text class="title" x="36" y="76">NPE</text>
+  <text class="code" x="36" y="104">user = null</text>
+  <text class="code" x="36" y="128">user.getName()</text>
+  <line x1="120" y1="140" x2="120" y2="168" stroke="#be123c" stroke-width="2" marker-end="url(#arrow-rose)"/>
+  <text class="bad" x="40" y="188">无法分发 → NPE</text>
+
+  <rect class="panel" x="272" y="48" width="280" height="160" rx="10"/>
+  <text class="title" x="292" y="76">Optional</text>
+  <rect class="box-blue" x="300" y="96" width="100" height="40" rx="6"/><text class="node-text" x="318" y="122">有值盒子</text>
+  <rect class="box" x="420" y="96" width="100" height="40" rx="6"/><text class="node-text" x="440" y="122">empty</text>
+  <text class="sub" x="300" y="168">orElse / orElseThrow / ifPresent</text>
+
+  <rect class="panel" x="568" y="48" width="176" height="160" rx="10"/>
+  <text class="title" x="584" y="76">String</text>
+  <text class="code" x="584" y="110">s = "Ada"</text>
+  <text class="code" x="584" y="136">toUpperCase()</text>
+  <text class="ok" x="584" y="170">新 "ADA"</text>
+  <text class="sub" x="584" y="192">原 s 仍 Ada</text>
+
+  <rect class="panel" x="16" y="232" width="728" height="160" rx="10"/>
+  <text class="title" x="36" y="262">金额用 BigDecimal，不用 double</text>
+  <text class="bad" x="36" y="300">0.1 + 0.2 (double) → 0.30000000000000004</text>
+  <text class="ok" x="36" y="336">new BigDecimal("0.1").add(new BigDecimal("0.2")) → 0.3</text>
+  <text class="sub" x="36" y="368">用字符串构造，避免 double 误差被固化进 BigDecimal</text>
+</svg>
