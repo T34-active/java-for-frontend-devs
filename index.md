@@ -1,0 +1,23 @@
+---
+layout: home
+
+hero:
+  name: Java For Frontend Devs
+  text: 前端转 Java 全栈手册
+  tagline: 用你熟悉的 TS / React / Vue / Node 心智模型，直击 Java 与企业级后端的思维差异。代码即文档，边读边跑。
+  actions:
+    - theme: brand
+      text: 从安装 Java 开始
+      link: /01-Java-Core-And-OOP/00-install-jdk-and-toolchain
+    - theme: alt
+      text: 全书路线图
+      link: /guide
+
+features:
+  - title: 前端视角类比
+    details: Maven ≈ npm、IoC ≈ DI/Context、Stream ≈ map/filter、ThreadLocal ≈ 异步上下文——跳过编程常识，直击差异。
+  - title: 代码即文档
+    details: 每章 Markdown 都对应 src/ 下可运行的 Java Demo，mvn exec:java 或 IDE 一键跑。
+  - title: 生产避坑 + 面试
+    details: NPE、循环依赖、事务失效、缓存三大问题等高频坑，章末附面试考点。
+---

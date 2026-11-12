@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.jffd</groupId>
+        <artifactId>java-for-frontend-devs</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>01-java-core-and-oop</artifactId>
+    <name>01-Java-Core-And-OOP</name>
+    <description>Java 核心与 OOP —— 模块一可运行示例</description>
+
+    <!--
+      本模块刻意不加 Spring Boot，只依赖 JDK。
+      前端类比：先学 TypeScript 语言本身，再学 React/Vue 框架。
+    -->
+    <dependencies>
+        <!-- 仅 JDK 标准库 + 父 POM 的 Lombok -->
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <!-- 方便用 mvn exec:java 跑示例 -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>

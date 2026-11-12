@@ -1,0 +1,23 @@
+# Maven / IDE
+target/
+.idea/
+*.iml
+.vscode/
+*.class
+*.jar
+*.war
+*.log
+.DS_Store
+*.swp
+
+# Node / VitePress
+node_modules/
+.vitepress/dist/
+.vitepress/cache/
+dist/
+
+# Env & secrets
+.env
+*.pem
+application-local.yml
+application-local.properties

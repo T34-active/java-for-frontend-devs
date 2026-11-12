@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+      前端类比：这个 pom.xml ≈ package.json + package-lock 的「项目声明」角色。
+      - groupId/artifactId/version ≈ name + version（加了组织命名空间）
+      - dependencies ≈ dependencies
+      - parent(spring-boot-starter-parent) ≈ 锁定一套兼容版本的「workspace / preset」
+      - plugins ≈ scripts + 构建工具链（类似 vite/webpack 配置）
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.5</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.jffd</groupId>
+    <artifactId>java-for-frontend-devs</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Java_For_Frontend_Devs</name>
+    <description>前端工程师转 Java 全栈的系统化学习仓库</description>
+
+    <modules>
+        <!-- 第一步只启用模块一；后续章节生成后再解开注释 -->
+        <module>01-Java-Core-And-OOP</module>
+        <!-- <module>02-Concurrency-And-JVM</module> -->
+        <!-- <module>03-SpringBoot-Ecosystem</module> -->
+        <!-- <module>04-Database-And-ORM</module> -->
+        <!-- <module>05-Middleware-And-Architecture</module> -->
+    </modules>
+
+    <properties>
+        <java.version>17</java.version>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mybatis-plus.version>3.5.9</mybatis-plus.version>
+        <sa-token.version>1.39.0</sa-token.version>
+    </properties>
+
+    <!-- 统一版本管理：类似前端的 overrides / resolutions -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-spring-boot3-starter</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- 全仓库通用依赖：Lombok 类似 TS 装饰器/样板代码生成器 -->
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <release>${maven.compiler.release}</release>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

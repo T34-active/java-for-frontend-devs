@@ -1,0 +1,13 @@
+{
+  "name": "java-for-frontend-devs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev --host --port 6100",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview --host --port 6100"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.3"
+  }
+}
