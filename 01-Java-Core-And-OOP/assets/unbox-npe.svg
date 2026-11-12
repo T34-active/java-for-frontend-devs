@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 300" role="img" aria-labelledby="title desc">
+  <title id="title">对 null 包装类型拆箱导致 NPE</title>
+  <desc id="desc">拆箱时编译器插入 intValue，missing 为 null 则抛出 NullPointerException。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#be123c"/>
+    </marker>
+    <style><![CDATA[
+      .title { font: 700 15px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
+      .code { font: 600 13px ui-monospace, Consolas, monospace; fill: #334155; }
+      .node-text { font: 600 13px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
+      .node { fill: #fff1f2; stroke: #e11d48; stroke-width: 2; }
+      .node-mid { fill: #fff7ed; stroke: #ea580c; stroke-width: 2; }
+      .node-start { fill: #f8fafc; stroke: #64748b; stroke-width: 2; }
+    ]]></style>
+  </defs>
+  <text class="title" x="24" y="32">拆箱时若引用是 null</text>
+  <text class="code" x="24" y="56">int raw = missing;</text>
+  <rect class="node-start" x="160" y="76" width="400" height="48" rx="8"/>
+  <text class="node-text" x="220" y="106">源码：int raw = missing</text>
+  <line x1="360" y1="124" x2="360" y2="152" stroke="#be123c" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <rect class="node-mid" x="160" y="154" width="400" height="48" rx="8"/>
+  <text class="node-text" x="200" y="184">编译器插入 missing.intValue()</text>
+  <line x1="360" y1="202" x2="360" y2="230" stroke="#be123c" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <rect class="node" x="80" y="232" width="560" height="48" rx="8"/>
+  <text class="node-text" x="120" y="262" fill="#be123c">missing 为 null → 调用实例方法 → NullPointerException</text>
+</svg>

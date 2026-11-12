@@ -1,34 +1,21 @@
 # 4. 泛型
 
-> TS 泛型你已经会了。这章重点是 Java 的擦除和 PECS——卡编译器的地方多半在这。  
-> 对应：[`GenericsDemo.java`](./src/main/java/com/jffd/core/generics/GenericsDemo.java)
+本章讨论 Java 泛型：为什么需要它、如何声明泛型类与方法、通配符与 PECS、类型擦除带来的限制，以及边界和数组的差异。
+
+对应代码：[`GenericsDemo.java`](./src/main/java/com/jffd/core/generics/GenericsDemo.java)
+
+| | |
+|--|--|
+| 前置 | 会写 `List<String>`；知道类型参数必须是引用类型（第 1、3 章）。 |
+| 学完应能 | 声明泛型类/方法；用 PECS 读/写通配符；解释类型擦除及不能 `new T()` / `List<int>` 的原因。 |
+
+本章把「泛型本身」拆开讲清楚，按顺序读。
 
 ---
 
-## 和 TS Generics 的同与不同
+## 4.1 没有泛型时会发生什么
 
-相同点：
-
-```ts
-type ApiResponse<T> = { code: number; message: string; data: T }
-function first<T>(arr: T[]): T | undefined { return arr[0] }
-```
-
-```java
-public class ApiResponse<T> { ... }
-public static <T> T first(List<T> list) { ... }
-```
-
-最大不同：
-
-> Java 泛型主要在编译期存在，运行时会擦除。  
-> TS 类型也会擦掉，但 Java 因此多了「不能 `new T()`、不能写 `List<String>.class`」这类硬限制。
-
----
-
-## 4.1 为啥要泛型
-
-远古写法：
+早期集合不带元素类型信息：
 
 ```java
 List list = new ArrayList();
@@ -37,15 +24,17 @@ list.add(1);
 String s = (String) list.get(1); // 运行时 ClassCastException
 ```
 
-有了泛型：
+错误被推迟到运行期，而且要靠强制转换。
+
+有了泛型之后，元素类型在编译期就被约束：
 
 ```java
 List<String> list = new ArrayList<>();
 list.add("x");
-// list.add(1); // 编译失败 —— 就是 TS 教过你的价值
+// list.add(1); // 编译失败
 ```
 
-钻石操作符 `<>`：右边可推断。
+右边可以用钻石操作符 `<>`，让编译器推断类型参数：
 
 ```java
 Map<String, List<Integer>> map = new HashMap<>();
@@ -53,7 +42,9 @@ Map<String, List<Integer>> map = new HashMap<>();
 
 ---
 
-## 4.2 泛型类 / 方法 / 接口
+## 4.2 泛型类、泛型方法
+
+**泛型类**：在类名后声明类型参数。
 
 ```java
 public class Box<T> {
@@ -61,76 +52,93 @@ public class Box<T> {
     public void set(T value) { this.value = value; }
     public T get() { return value; }
 }
+```
 
+**泛型方法**：类型参数写在返回类型前面，属于「这个方法自己的」参数，可以和类上的 `<T>` 无关。
+
+```java
 public static <T> T first(List<T> list) {
     return list.isEmpty() ? null : list.get(0);
 }
 ```
 
-方法上的 `<T>` 写在返回类型前面，是「该方法自己的类型参数」，可以和类上的 `<T>` 不是一回事。
-
 命名习惯：`T` 类型、`E` 元素、`K`/`V` 键值、`R` 返回值。  
-后端天天见：`Result<T>`、`Page<T>`、`Repository<T, ID>`。
+后端常见形态：`Result<T>`、`Page<T>`、`Repository<T, ID>`、`ApiResponse<T>`。
 
 ---
 
-## 4.3 通配符与 PECS
+## 4.3 不变性、通配符与 PECS
 
-Java 泛型默认不变（invariant）：
+Java 泛型默认是**不变**（invariant）的：`List<Integer>` **不是** `List<Number>` 的子类型。
 
 ```java
 List<Integer> ints = List.of(1, 2);
 // List<Number> nums = ints; // 编译错误
 ```
 
-数组不一样（协变，且不安全）：
+若允许这样赋值，就可能往「以为是 Number 的列表」里塞入 `Double`，破坏 `Integer` 列表。
+
+数组则不同：数组是协变的，但不安全：
 
 ```java
 Number[] arr = new Integer[2];
-arr[0] = 1.5; // 编译过，运行 ArrayStoreException
+arr[0] = 1.5; // 编译通过，运行期 ArrayStoreException
 ```
 
-所以用通配符表达有限的协变/逆变：
+为了在「只读」或「只写」场景表达有限的灵活性，Java 提供通配符。口诀 **PECS**：Producer Extends, Consumer Super。
 
-| 写法 | 读作 | 能做什么 | 前端直觉 |
-|------|------|----------|----------|
-| `List<? extends Number>` | 某种 Number 子类型列表 | 主要能读成 Number；不能随意 add | 只读协变 |
-| `List<? super Integer>` | 某种 Integer 父类型列表 | 能 add Integer；读出来当 Object | 只写逆变 |
-| `List<?>` | 未知 | 几乎只能读 Object | `unknown[]` |
+![PECS：Producer Extends, Consumer Super](./assets/pecs-wildcard.svg)
 
-口诀：Producer Extends，Consumer Super。
+### `? extends`：生产者（上界通配）
 
 ```java
 static double sum(List<? extends Number> source) {
     double total = 0;
-    for (Number n : source) total += n.doubleValue();
-    // source.add(1); // 不行：说不定是 List<Double>
+    for (Number n : source) {
+        total += n.doubleValue();
+    }
+    // source.add(1); // 不行：实际可能是 List<Double>
     return total;
-}
-
-static void fill(List<? super Integer> sink) {
-    sink.add(10);
-    // Integer x = sink.get(0); // 不行：可能是 List<Object>
 }
 ```
 
-你想写「既能处理 `List<Integer>` 也能处理 `List<Double>` 的求和」——没有 `? extends` 就得复制两套。  
-TS 的 `T extends Foo` 你很熟；Java 的 `? extends` / `? super` 是使用处通配，别硬套成同一套语法糖。
+你可以从中**读成**上界类型（这里是 `Number`），但通常不能往里随意 `add`。
+
+### `? super`：消费者（下界通配）
+
+```java
+static void fill(List<? super Integer> sink) {
+    sink.add(10);
+    // Integer x = sink.get(0); // 不行：实际可能是 List<Object>
+}
+```
+
+你可以往里**写入**下界类型（这里是 `Integer`），读出来时通常只能当成 `Object`。
+
+### 无界通配 `?`
+
+`List<?>` 表示元素类型未知，几乎只能安全地读成 `Object`，不能随意添加（除 `null` 等少数情况）。
+
+口诀：**PECS** — Producer Extends，Consumer Super。  
+需要「读一堆 Number 子类型」用 `? extends`；需要「写入 Integer」用 `? super`。
 
 ---
 
 ## 4.4 类型擦除
 
-编译后大致变成「原始类型 + 必要强制转换」：
+**类型擦除**的意思是：泛型主要在编译期检查；编译之后，类型参数基本消失，运行时看到的是原始类型（raw type），并插入必要的强制转换。
 
-```text
-List<String>  →  List
-List<Integer> →  List
-```
+![类型擦除](./assets/type-erasure.svg)
 
-因此不能：`new T()`、`new T[10]`、`List<String>.class`、`catch (T)`、运行时 `instanceof List<String>`。
+因此有一批硬限制：
 
-需要运行时类型时，把 `Class<T>` 当令牌传进来——类似把 zod schema / class constructor 传进工厂：
+- 不能 `new T()`、`new T[10]`  
+- 不能写 `List<String>.class`  
+- 不能 `catch (T e)`  
+- 运行时不能可靠地做 `instanceof List<String>`  
+- 不能写 `List<int>`：类型参数必须是引用类型（见 [第 1 章](./01-strong-typing-and-basics.md#11-基本类型与包装类型)）
+
+需要在运行时知道具体类型时，常把 `Class<T>` 当作令牌传入：
 
 ```java
 public static <T> T create(Class<T> type) throws Exception {
@@ -139,13 +147,15 @@ public static <T> T create(Class<T> type) throws Exception {
 String s = create(String.class);
 ```
 
-Jackson 反序列化泛型常用 `TypeReference<List<User>>`，也是在补运行时信息（模块三再碰）。
+JSON 反序列化泛型时，框架常用 `TypeReference<List<User>>` 之类手段补回运行时信息（模块三再细讲）。
 
-桥接方法了解即可：擦除后为保住多态，编译器可能生成合成方法。面试提到「擦除 + 桥接」够用。
+桥接方法：擦除后为了保持多态，编译器可能生成合成方法。面试提到「擦除 + 桥接」即可。
 
 ---
 
-## 4.5 边界
+## 4.5 类型边界
+
+可以限制类型参数必须满足某些约束：
 
 ```java
 public static <T extends Comparable<T>> T max(T a, T b) {
@@ -153,65 +163,71 @@ public static <T extends Comparable<T>> T max(T a, T b) {
 }
 ```
 
-≈ TS：`function max<T extends Comparable<T>>(a: T, b: T): T`
-
-多界：`<T extends Animal & Serializable & Comparable<T>>`，类只能放第一个，其余是接口。
+多界写法：`<T extends Animal & Serializable & Comparable<T>>`。若有类，类必须写在第一位，其余为接口。
 
 ---
 
-## 4.6 泛型与数组：别混
+## 4.6 泛型与数组如何选择
 
-数组协变、运行时知分量类型 → 可能 `ArrayStoreException`。  
-泛型不变、运行时擦除 → 更偏编译期安全。  
+| | 数组 | 泛型集合 |
+|--|------|----------|
+| 子类型关系 | 协变 | 默认不变 |
+| 运行时元素类型 | 记得较清楚 | 擦除后变模糊 |
+| 典型风险 | `ArrayStoreException` | 编译期拦住更多错误 |
 
-容器优先 `List<T>`。看到 `unchecked` 警告别无脑压制，先想办法消掉。
-
----
-
-## 4.7 和后端现实的关系
-
-你会不断写 `ApiResponse<UserVO>`、`Page<Order>`、各种 `List<Foo>`。擦除的实际影响：
-
-1. 反射拿到的字段可能是擦除后的信息，框架靠额外元数据补。  
-2. JSON 反序列化必须告诉框架「这是 `List<User>` 不是 `List`」。  
-3. 公共 API 别返回原始类型 `List`，会污染调用方。
+业务容器优先 `List<T>`。看到 `unchecked` 警告时，先设法消掉，不要无脑 `@SuppressWarnings`。
 
 ---
 
-## 4.8 先自测
+## 4.7 在后端代码里你会怎么碰到擦除
 
-1. 为啥 `List<Integer>` 不能直接当 `List<Number>`？  
-2. PECS 分别解决读和写哪边？  
-3. 为啥不能 `new T()`？常见绕法？  
-4. 数组协变和泛型不变，哪个更危险？  
-5. `ApiResponse<T>` 为啥适合泛型？
+1. 反射拿到的字段类型可能已是擦除后的信息，框架靠额外元数据补全。  
+2. JSON 反序列化必须明确告诉框架：这是 `List<User>`，不是原始 `List`。  
+3. 公共 API 不要返回原始类型 `List`，会把不安全扩散给调用方。
 
 ---
 
-## 4.9 动手
+## 检验一下
+
+1. 为什么不能写 `List<int>`？和类型擦除有什么关系？  
+2. 为什么 `List<Integer>` 不能直接当成 `List<Number>`？  
+3. PECS 分别解决读和写哪一边？  
+4. 为什么不能 `new T()`？常见绕法是什么？  
+5. 数组协变和泛型不变，哪个更容易在运行期出问题？  
+6. `ApiResponse<T>` 为什么适合做成泛型？
+
+---
+
+## 动手
+
+1. 运行：
 
 ```bash
 mvn -pl 01-Java-Core-And-OOP exec:java -Dexec.mainClass="com.jffd.core.generics.GenericsDemo"
 ```
 
-对照：`Box`、`ApiResponse`、`sum(? extends)`、`fill(? super)`、`Class<T>` 工厂。
+2. 对照 `Box`、`ApiResponse`、`sum(? extends)`、`fill(? super)`、`Class<T>` 工厂。
 
 ---
 
 ## 避坑
 
-1. 原始类型 `List` 与 `List<String>` 混搭  
-2. 乱 `@SuppressWarnings("unchecked")`  
-3. 返回 `List<?>` 导致调用方什么都加不了  
-4. 硬造泛型数组  
-5. 以为运行时还能区分 `List<String>` 和 `List<Integer>`  
+1. 原始类型 `List` 与 `List<String>` 混用  
+2. 随意 `@SuppressWarnings("unchecked")`  
+3. 返回 `List<?>` 导致调用方几乎无法添加元素  
+4. 强行创建泛型数组  
+5. 以为运行时还能区分 `List<String>` 和 `List<Integer>`
 
-## 面试
+## 面试（可选）
 
-- 类型擦除？有哪些限制？  
+- 什么是类型擦除？有哪些限制？  
 - `? extends` 与 `? super`？PECS？  
-- 泛型与数组差异？  
-- 如何获取泛型运行时类型信息？  
+- 泛型与数组的差异？  
+- 如何获取泛型的运行时类型信息？  
 - 桥接方法是什么？（加分）
+
+## 小结
+
+泛型把类型错误尽量提前到编译期；通配符用 PECS 表达只读或只写；运行时类型参数基本擦掉，所以有一批「不能做」的硬限制。下一章用这些集合与泛型，搭 Stream 管道。
 
 下一章 → [05-stream-and-lambda.md](./05-stream-and-lambda.md)

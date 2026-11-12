@@ -1,109 +1,80 @@
 # 5. Stream 与 Lambda
 
-> 你会 `map/filter/reduce` 就已经赢在起跑线。这章补 Java Stream 的惰性、一次性、collect、并行陷阱。  
-> 对应：[`StreamDemo.java`](./src/main/java/com/jffd/core/stream/StreamDemo.java)
+本章讨论 Java 的 Lambda、函数式接口，以及 Stream 管道：中间操作与终端操作、惰性求值、`collect`、`map`/`flatMap`，还有并行流的适用边界。
 
----
+对应代码：[`StreamDemo.java`](./src/main/java/com/jffd/core/stream/StreamDemo.java)
 
-## 像极了，但别当成 Array 方法集
+| | |
+|--|--|
+| 前置 | 会写 `for` 与集合遍历；第 3–4 章的 `List` / 泛型基础。 |
+| 学完应能 | 写出 filter/map/collect 管道；区分中间与终端操作；说明 Stream 不可复用；知道何时不要用 `parallelStream`。 |
 
-```ts
-users
-  .filter(u => u.age >= 18)
-  .map(u => u.name)
-  .sort()
-```
-
-```java
-users.stream()
-    .filter(u -> u.age() >= 18)
-    .map(UserView::name)
-    .sorted()
-    .toList();
-```
-
-三处差别：
-
-1. Stream 用过就废，不能像数组反复 `map`。  
-2. 中间操作惰性，碰到终端操作才真正算。  
-3. `parallelStream()` 是真并行线程，不是 `Promise.all` 那种 IO 调度直觉。
+若写过数组的 `map`/`filter` 会更容易上手，仍请按顺序建立 Java Stream 自己的规则。
 
 ---
 
 ## 5.1 Lambda 与函数式接口
 
+**Lambda** 是一段可传递的简短行为。在 Java 里，它必须能匹配某个**函数式接口**——即只有一个抽象方法的接口（常用 `@FunctionalInterface` 标注）。
+
 ```java
 BinaryOperator<Integer> add = (a, b) -> a + b;
 Runnable r = () -> System.out.println("hi");
-
-list.forEach(System.out::println);
-list.stream().map(String::toUpperCase);
-list.stream().map(User::name);
 ```
 
-| 接口 | 形态 | ≈ TS | 典型场景 |
-|------|------|------|----------|
-| `Function<T,R>` | T → R | `(t)=>R` | map |
-| `Predicate<T>` | T → boolean | 断言 | filter |
-| `Consumer<T>` | T → void | 副作用 | forEach |
-| `Supplier<T>` | () → T | 工厂 | 懒创建 |
-| `UnaryOperator<T>` | T → T | 同型映射 | |
-| `BinaryOperator<T>` | (T,T)→T | reduce | |
+**方法引用**是 Lambda 的一种简写，指向已有方法：
 
-目标类型得是只有一个抽象方法的接口（`@FunctionalInterface`）。  
-跟 TS「函数当值」一样，只是必须落在某个接口类型上。
+```java
+list.forEach(System.out::println);
+list.stream().map(String::toUpperCase);
+```
+
+常见函数式接口：
+
+| 接口 | 形态 | 典型用途 |
+|------|------|----------|
+| `Function<T,R>` | T → R | `map` |
+| `Predicate<T>` | T → boolean | `filter` |
+| `Consumer<T>` | T → void | `forEach` |
+| `Supplier<T>` | () → T | 懒创建 / 工厂 |
+| `UnaryOperator<T>` | T → T | 同型变换 |
+| `BinaryOperator<T>` | (T,T) → T | `reduce` |
 
 ### 变量捕获
 
-外层局部变量必须是 final 或事实上 final：
+Lambda 可以读取外层局部变量，但该变量必须是 **final** 或**事实上 final**（赋值后不再改）：
 
 ```java
 int factor = 2;
-list.stream().map(x -> x * factor); // OK
-// factor = 3; // 再改就不让捕获了
+list.stream().map(x -> x * factor); // 可以
+// factor = 3; // 若再改，上面的捕获就不合法
 ```
-
-前端闭包更自由；这份限制能减少「抓了个会变的变量」——并行时更明显。
 
 ---
 
-## 5.2 对照表
+## 5.2 什么是 Stream
 
-| JS / lodash | Java Stream |
-|-------------|-------------|
-| `map` | `map` / `mapToInt`… |
-| `filter` | `filter` |
-| `reduce` | `reduce` / **`collect`** |
-| `flatMap` | `flatMap` |
-| `find` / `some` | `findFirst` / `anyMatch` |
-| `every` | `allMatch` |
-| `slice` | `skip` + `limit` |
-| `sort` | `sorted` |
-| `join` | `Collectors.joining` |
-| `groupBy` | `Collectors.groupingBy` |
-| `uniq` | `distinct` |
+**Stream** 是对数据序列的一次性处理管道。你先描述要做什么（过滤、映射、排序……），再在终端操作时真正计算。
 
 ```java
 List<String> result = users.stream()
     .filter(u -> u.age() >= 18)
     .map(UserView::name)
     .sorted()
-    .toList(); // Java 16+；老代码 collect(Collectors.toList())
+    .toList(); // Java 16+；更早写法：collect(Collectors.toList())
 ```
+
+先记住三条规则：
+
+1. Stream **用过就废**，不能像集合那样反复拿来 `map`。  
+2. **中间操作惰性**，遇到终端操作才开始算。  
+3. `parallelStream()` 使用多线程并行，不是「随便加点速度」的开关。
 
 ---
 
-## 5.3 中间操作 vs 终端操作
+## 5.3 中间操作与终端操作
 
-```text
-创建 Stream
-   │  filter / map / flatMap / sorted / peek ...   ← 中间：惰性，搭管道
-   ▼
-终端：collect / toList / forEach / findFirst / count / reduce ...
-   │
-   ▼
-触发计算；之后 Stream 作废
-```
+![Stream 惰性管道](./assets/stream-pipeline.svg)
 
 ```java
 List.of(1, 2, 3, 4, 5).stream()
@@ -116,17 +87,16 @@ List.of(1, 2, 3, 4, 5).stream()
         return n * n;
     })
     .findFirst();
-// 往往不会跑完 1..5：短路
+// 往往不会处理完 1..5：终端操作可短路
 ```
 
-像生成器 / 惰性迭代，不是每步都物化成新数组。  
-`peek` 只建议调试用，别在生产管道里塞业务副作用。
+`peek` 适合调试时观察元素，不建议在生产管道里塞业务副作用。
 
 ---
 
-## 5.4 `collect` 才是业务主力
+## 5.4 `collect` 与 Collectors
 
-分组、拼接、下游统计，优先 Collectors：
+把流收成集合、字符串或分组结果，常用 **`collect`** 和 **`Collectors`**。
 
 ```java
 Map<String, Long> countByDept = emps.stream()
@@ -140,16 +110,14 @@ String csv = emps.stream()
     .collect(Collectors.joining(", "));
 ```
 
-`groupingBy` ≈ lodash `groupBy` + 各种下游聚合。报表、列表变 Map 时天天用。
+`groupingBy` 负责按某个键分组，后面可以再接下游收集器做计数、求和等。报表、列表转 Map 时经常用到。
 
 ---
 
-## 5.5 `map` vs `flatMap`
+## 5.5 `map` 与 `flatMap`
 
-```text
-map：     1 入 → 1 出（形态变，层数不变）
-flatMap： 1 入 → 0..n 出，并摊平一层
-```
+- **`map`**：一个输入对应一个输出，结构层数不变。  
+- **`flatMap`**：一个输入对应 0..n 个输出，并把结果摊平一层。
 
 ```java
 List<Optional<String>> maybe = List.of(Optional.of("React"), Optional.empty());
@@ -158,79 +126,83 @@ List<String> names = maybe.stream()
     .toList();
 ```
 
-前端：`arr.map(...).flat()` 或直接 `flatMap`。
-
 ---
 
 ## 5.6 副作用与并行流
 
-中间操作尽量纯。写库、发 HTTP、打复杂日志：慎进 stream，常不如普通 for 清晰。
+中间操作应尽量没有副作用。写库、发 HTTP、打复杂业务日志，放进 Stream 往往不如普通 `for` 清晰。
 
-`parallelStream()` 适合：CPU 密集、无共享可变、数据量大到抵得过调度成本。  
+**`parallelStream()`** 适合：CPU 密集、无共享可变状态、数据量大到值得支付调度成本。
 
-不适合：DB / Redis / HTTP（打爆连接池）、共享 `ArrayList.add`、事务边界里乱并行。
+不适合：数据库 / Redis / HTTP（容易打爆连接池）、往共享 `ArrayList` 里 `add`、事务边界里随意并行。
 
 ```java
-// 并行里抢同一个 ArrayList → 数据竞争
+// 危险：并行线程抢同一个 ArrayList
 List<String> sink = new ArrayList<>();
 list.parallelStream().forEach(sink::add);
 
-// 让 collect 帮你收
-List<String> ok = list.parallelStream().map(...).toList();
+// 让终端收集器帮你汇总
+List<String> ok = list.parallelStream().map(String::trim).toList();
 ```
 
-公共池是 `ForkJoinPool.commonPool()`——和 Node 里开几个 Promise 不是一个资源模型。模块二讲线程池后再回来看。
+并行流默认使用 `ForkJoinPool.commonPool()`。线程池细节见模块二。
 
 ---
 
 ## 5.7 调试与受检异常
 
-- 断点难跟：临时 `peek(System.out::println)`  
-- Lambda 里抛受检异常很烦：包装成 RuntimeException，或退回 for  
-- 同一 Stream 用两次 → `IllegalStateException`：先 collect 成 List 再多次处理  
+- 管道难跟时，可临时 `peek(System.out::println)`。  
+- Lambda 里抛出**受检异常**往往编不过：抽到普通循环，或包装成未受检异常（见第 6 章）。  
+- 同一个 Stream 使用两次会抛 `IllegalStateException`：先收集成 `List`，再多次处理。
 
 ```java
 var stream = list.stream().map(String::trim);
 stream.toList();
-// stream.toList(); // 第二次炸
+// stream.toList(); // 第二次会失败
 ```
 
 ---
 
-## 5.8 先自测
+## 检验一下
 
-1. 为啥说 Stream 是惰性的？什么触发计算？  
-2. 为啥 Stream 不能复用？  
-3. 什么时候用 `groupingBy` 而不是手写 for？  
-4. `map` 和 `flatMap` 差在哪？  
-5. 为啥 IO 密集别用 `parallelStream`？
+1. 为什么说 Stream 是惰性的？什么触发计算？  
+2. 为什么 Stream 不能复用？  
+3. 什么时候用 `groupingBy`，而不是手写 `for`？  
+4. `map` 和 `flatMap` 差在哪里？  
+5. 为什么 IO 密集场景不要随意用 `parallelStream`？
 
 ---
 
-## 5.9 动手
+## 动手
+
+1. 运行：
 
 ```bash
 mvn -pl 01-Java-Core-And-OOP exec:java -Dexec.mainClass="com.jffd.core.stream.StreamDemo"
 ```
 
-重点看：`peek` 证明短路；`groupingBy`；`Optional.stream` 摊平。
+2. 观察 `peek` 与短路、`groupingBy`、`Optional.stream` 摊平。
 
 ---
 
 ## 避坑
 
-1. Stream 用两次  
+1. Stream 使用两次  
 2. 并行流 + 共享可变集合  
-3. stream 里做远程调用 / 开事务  
-4. `map` 出 null 再下游 NPE  
-5. 简单 for 硬写成不可维护管道  
+3. 在 stream 里做远程调用或开启事务  
+4. `map` 产生 null，下游再解引用导致 NPE  
+5. 把本可用清晰 `for` 写完的逻辑硬扭成难读管道
 
-## 面试
+## 面试（可选）
 
 - 中间操作与终端操作？惰性求值？  
 - `map` 与 `flatMap`？  
-- 并行流原理与适用/禁用场景？  
-- Lambda 与匿名内部类（this、final 捕获）？  
-- `Collectors.toList()` 与 `.toList()` 差异？
+- 并行流原理与适用 / 禁用场景？  
+- Lambda 与匿名内部类在 `this`、变量捕获上的差别？  
+- `Collectors.toList()` 与 `.toList()` 的差异？
+
+## 小结
+
+Stream 是一次性、可惰性的数据处理管道；`collect` 是业务收口主力；并行流要克制。下一章讲失败如何被看见：异常分类、资源关闭与业务异常。
 
 下一章 → [06-exception-system.md](./06-exception-system.md)

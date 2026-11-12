@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" role="img">
+  <title>多态：按实际对象类型分发</title>
+  
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="arrow-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1d4ed8"/>
+    </marker>
+    <marker id="arrow-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#be123c"/>
+    </marker>
+    <style><![CDATA[
+      .title { font: 700 15px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
+      .sub { font: 600 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #64748b; }
+      .node-text { font: 600 13px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
+      .code { font: 600 12px ui-monospace, Consolas, monospace; fill: #334155; }
+      .ok { font: 600 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #047857; }
+      .bad { font: 600 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #be123c; }
+      .panel { fill: #f8fafc; stroke: #e2e8f0; stroke-width: 1.5; }
+      .box { fill: #f8fafc; stroke: #64748b; stroke-width: 2; }
+      .box-teal { fill: #ecfdf5; stroke: #0f766e; stroke-width: 2; }
+      .box-orange { fill: #fff7ed; stroke: #c2410c; stroke-width: 2; }
+      .box-blue { fill: #eff6ff; stroke: #2563eb; stroke-width: 2; }
+      .box-rose { fill: #fff1f2; stroke: #e11d48; stroke-width: 2; }
+      .box-amber { fill: #fffbeb; stroke: #d97706; stroke-width: 2; }
+    ]]></style>
+  </defs>
+
+  <text class="title" x="24" y="28">多态：编译期看声明类型，运行期看真实对象</text>
+
+  <text class="code" x="36" y="64">Payment p = new AlipayPayment();  p.pay(100);</text>
+
+  <rect class="box-teal" x="60" y="90" width="70" height="44" rx="8"/><text class="node-text" x="82" y="118">p</text>
+  <line x1="130" y1="112" x2="220" y2="112" stroke="#0f766e" stroke-width="2.5" marker-end="url(#arrow-teal)"/>
+  <rect class="box-orange" x="220" y="80" width="200" height="64" rx="8"/>
+  <text class="node-text" x="240" y="110">AlipayPayment 对象</text>
+  <text class="sub" x="240" y="132">真实类型</text>
+
+  <line x1="420" y1="112" x2="500" y2="112" stroke="#1d4ed8" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <rect class="box-blue" x="500" y="80" width="220" height="64" rx="8"/>
+  <text class="node-text" x="520" y="110">调用 Alipay 的 pay</text>
+  <text class="sub" x="520" y="132">不是父类空实现</text>
+
+  <text class="sub" x="36" y="200">声明类型 Payment 决定「能调用哪些方法」；运行时对象类型决定「跑哪份实现」。</text>
+  <text class="sub" x="36" y="232">这就是接口 + 组合能在 Spring 里替换实现的基础。</text>
+</svg>
