@@ -4,31 +4,83 @@
   
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--c-muted)"/>
     </marker>
     <marker id="arrow-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/>
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--c-teal)"/>
     </marker>
     <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#1d4ed8"/>
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--c-blue-deep)"/>
     </marker>
     <marker id="arrow-rose" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#be123c"/>
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--c-bad)"/>
     </marker>
-    <style><![CDATA[
-      .title { font: 700 15px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
-      .sub { font: 600 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #64748b; }
-      .node-text { font: 600 13px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
-      .code { font: 600 12px ui-monospace, Consolas, monospace; fill: #334155; }
-      .ok { font: 600 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #047857; }
-      .bad { font: 600 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #be123c; }
-      .panel { fill: #f8fafc; stroke: #e2e8f0; stroke-width: 1.5; }
-      .box { fill: #f8fafc; stroke: #64748b; stroke-width: 2; }
-      .box-teal { fill: #ecfdf5; stroke: #0f766e; stroke-width: 2; }
-      .box-orange { fill: #fff7ed; stroke: #c2410c; stroke-width: 2; }
-      .box-blue { fill: #eff6ff; stroke: #2563eb; stroke-width: 2; }
-      .box-rose { fill: #fff1f2; stroke: #e11d48; stroke-width: 2; }
-      .box-amber { fill: #fffbeb; stroke: #d97706; stroke-width: 2; }
+    <style><![CDATA[:root {
+  color-scheme: light dark;
+  --c-text: #0f172a;
+  --c-muted: #334155;
+  --c-soft: #475569;
+  --c-hint: #64748b;
+  --c-null-stroke: #94a3b8;
+  --c-panel: #f8fafc;
+  --c-null-fill: #f1f5f9;
+  --c-panel-stroke: #e2e8f0;
+  --c-step-stroke: #cbd5e1;
+  --c-teal-fill: #ecfdf5;
+  --c-teal: #0f766e;
+  --c-ok: #047857;
+  --c-orange-fill: #fff7ed;
+  --c-orange: #c2410c;
+  --c-orange-mid: #ea580c;
+  --c-rose-fill: #fff1f2;
+  --c-rose: #e11d48;
+  --c-bad: #be123c;
+  --c-blue-fill: #eff6ff;
+  --c-blue: #2563eb;
+  --c-blue-deep: #1d4ed8;
+  --c-amber-fill: #fffbeb;
+  --c-amber: #d97706;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-text: #e2e8f0;
+    --c-muted: #cbd5e1;
+    --c-soft: #94a3b8;
+    --c-hint: #94a3b8;
+    --c-null-stroke: #64748b;
+    --c-panel: #1e293b;
+    --c-null-fill: #334155;
+    --c-panel-stroke: #334155;
+    --c-step-stroke: #475569;
+    --c-teal-fill: #134e4a;
+    --c-teal: #2dd4bf;
+    --c-ok: #34d399;
+    --c-orange-fill: #7c2d12;
+    --c-orange: #fb923c;
+    --c-orange-mid: #fb923c;
+    --c-rose-fill: #881337;
+    --c-rose: #fb7185;
+    --c-bad: #fb7185;
+    --c-blue-fill: #1e3a8a;
+    --c-blue: #60a5fa;
+    --c-blue-deep: #60a5fa;
+    --c-amber-fill: #78350f;
+    --c-amber: #fbbf24;
+  }
+}
+.title { font: 700 15px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: var(--c-text); }
+      .sub { font: 600 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: var(--c-hint); }
+      .node-text { font: 600 13px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: var(--c-text); }
+      .code { font: 600 12px ui-monospace, Consolas, monospace; fill: var(--c-muted); }
+      .ok { font: 600 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: var(--c-ok); }
+      .bad { font: 600 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: var(--c-bad); }
+      .panel { fill: var(--c-panel); stroke: var(--c-panel-stroke); stroke-width: 1.5; }
+      .box { fill: var(--c-panel); stroke: var(--c-hint); stroke-width: 2; }
+      .box-teal { fill: var(--c-teal-fill); stroke: var(--c-teal); stroke-width: 2; }
+      .box-orange { fill: var(--c-orange-fill); stroke: var(--c-orange); stroke-width: 2; }
+      .box-blue { fill: var(--c-blue-fill); stroke: var(--c-blue); stroke-width: 2; }
+      .box-rose { fill: var(--c-rose-fill); stroke: var(--c-rose); stroke-width: 2; }
+      .box-amber { fill: var(--c-amber-fill); stroke: var(--c-amber); stroke-width: 2; }
     ]]></style>
   </defs>
 
@@ -38,7 +90,7 @@
   <text class="title" x="36" y="78">extends 继承</text>
   <text class="sub" x="36" y="104">A 是一种 B（is-a）</text>
   <rect class="box" x="50" y="130" width="150" height="40" rx="6"/><text class="node-text" x="95" y="156">父类 B</text>
-  <line x1="125" y1="170" x2="125" y2="198" stroke="#334155" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="125" y1="170" x2="125" y2="198" stroke="var(--c-muted)" stroke-width="2" marker-end="url(#arrow)"/>
   <rect class="box-teal" x="50" y="200" width="150" height="40" rx="6"/><text class="node-text" x="95" y="226">子类 A</text>
   <text class="sub" x="36" y="270">只能单继承</text>
 
@@ -46,7 +98,7 @@
   <text class="title" x="282" y="78">组合 has-a</text>
   <text class="sub" x="282" y="104">A 拥有一个 B</text>
   <rect class="box-teal" x="296" y="130" width="160" height="50" rx="6"/><text class="node-text" x="310" y="162">CheckoutService</text>
-  <line x1="376" y1="180" x2="376" y2="208" stroke="#0f766e" stroke-width="2" marker-end="url(#arrow-teal)"/>
+  <line x1="376" y1="180" x2="376" y2="208" stroke="var(--c-teal)" stroke-width="2" marker-end="url(#arrow-teal)"/>
   <rect class="box-orange" x="296" y="210" width="160" height="40" rx="6"/><text class="node-text" x="330" y="236">Payment</text>
   <text class="sub" x="282" y="280">优先复用行为</text>
 
@@ -54,7 +106,7 @@
   <text class="title" x="528" y="78">implements</text>
   <text class="sub" x="528" y="104">A 具备能力（can-do）</text>
   <rect class="box-blue" x="540" y="130" width="170" height="40" rx="6"/><text class="node-text" x="575" y="156">interface Payment</text>
-  <line x1="625" y1="170" x2="625" y2="198" stroke="#1d4ed8" stroke-width="2" marker-end="url(#arrow-blue)"/>
+  <line x1="625" y1="170" x2="625" y2="198" stroke="var(--c-blue-deep)" stroke-width="2" marker-end="url(#arrow-blue)"/>
   <rect class="box-teal" x="540" y="200" width="170" height="40" rx="6"/><text class="node-text" x="560" y="226">AlipayPayment</text>
   <text class="sub" x="528" y="280">可实现多个接口</text>
 </svg>

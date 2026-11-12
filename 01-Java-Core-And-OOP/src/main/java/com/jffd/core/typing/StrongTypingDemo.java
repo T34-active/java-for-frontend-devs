@@ -20,6 +20,7 @@ public class StrongTypingDemo {
         castAndControlFlow();
         equalsVsDoubleEquals();
         finalListAndOverload();
+        valuePassing();
         moneyAndOptional();
     }
 
@@ -129,7 +130,33 @@ public class StrongTypingDemo {
         System.out.println("[var] title=" + title);
     }
 
-    /** 知识要点六：Optional 与金额 */
+    /** 知识要点六：值传递 */
+    private static void valuePassing() {
+        int n = 10;
+        bump(n);
+        System.out.println("[value-pass] after bump n=" + n);
+
+        StringBuilder sb = new StringBuilder("Bob");
+        touch(sb);
+        System.out.println("[value-pass] after touch=" + sb);
+        rebind(sb);
+        System.out.println("[value-pass] after rebind=" + sb);
+    }
+
+    private static void bump(int a) {
+        a = 99;
+    }
+
+    private static void touch(StringBuilder sb) {
+        sb.setLength(0);
+        sb.append("Ada");
+    }
+
+    private static void rebind(StringBuilder sb) {
+        sb = new StringBuilder("Carol");
+    }
+
+    /** 知识要点七：Optional 与金额 */
     private static void moneyAndOptional() {
         System.out.println("[Optional] " + findUserName(1).orElse("anonymous"));
         System.out.println("[Optional] " + findUserName(99).orElse("anonymous"));

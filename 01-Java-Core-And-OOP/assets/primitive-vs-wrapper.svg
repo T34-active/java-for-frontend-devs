@@ -4,18 +4,70 @@
   <desc id="desc">对比 int 槽位直接存值、Integer 引用指向堆对象、以及 null 不指向任何对象。</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10 z" fill="#0f766e"/>
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--c-teal)"/>
     </marker>
-    <style><![CDATA[
-      .title { font: 700 16px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #0f172a; }
-      .code { font: 600 13px ui-monospace, Consolas, monospace; fill: #334155; }
-      .label { font: 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #475569; }
-      .box-text { font: 600 14px ui-monospace, Consolas, monospace; fill: #0f172a; }
-      .hint { font: 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: #64748b; }
-      .panel { fill: #f8fafc; stroke: #e2e8f0; stroke-width: 1.5; }
-      .slot { fill: #ecfdf5; stroke: #0f766e; stroke-width: 2; }
-      .obj { fill: #fff7ed; stroke: #c2410c; stroke-width: 2; }
-      .null-slot { fill: #f1f5f9; stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 6 4; }
+    <style><![CDATA[:root {
+  color-scheme: light dark;
+  --c-text: #0f172a;
+  --c-muted: #334155;
+  --c-soft: #475569;
+  --c-hint: #64748b;
+  --c-null-stroke: #94a3b8;
+  --c-panel: #f8fafc;
+  --c-null-fill: #f1f5f9;
+  --c-panel-stroke: #e2e8f0;
+  --c-step-stroke: #cbd5e1;
+  --c-teal-fill: #ecfdf5;
+  --c-teal: #0f766e;
+  --c-ok: #047857;
+  --c-orange-fill: #fff7ed;
+  --c-orange: #c2410c;
+  --c-orange-mid: #ea580c;
+  --c-rose-fill: #fff1f2;
+  --c-rose: #e11d48;
+  --c-bad: #be123c;
+  --c-blue-fill: #eff6ff;
+  --c-blue: #2563eb;
+  --c-blue-deep: #1d4ed8;
+  --c-amber-fill: #fffbeb;
+  --c-amber: #d97706;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-text: #e2e8f0;
+    --c-muted: #cbd5e1;
+    --c-soft: #94a3b8;
+    --c-hint: #94a3b8;
+    --c-null-stroke: #64748b;
+    --c-panel: #1e293b;
+    --c-null-fill: #334155;
+    --c-panel-stroke: #334155;
+    --c-step-stroke: #475569;
+    --c-teal-fill: #134e4a;
+    --c-teal: #2dd4bf;
+    --c-ok: #34d399;
+    --c-orange-fill: #7c2d12;
+    --c-orange: #fb923c;
+    --c-orange-mid: #fb923c;
+    --c-rose-fill: #881337;
+    --c-rose: #fb7185;
+    --c-bad: #fb7185;
+    --c-blue-fill: #1e3a8a;
+    --c-blue: #60a5fa;
+    --c-blue-deep: #60a5fa;
+    --c-amber-fill: #78350f;
+    --c-amber: #fbbf24;
+  }
+}
+.title { font: 700 16px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: var(--c-text); }
+      .code { font: 600 13px ui-monospace, Consolas, monospace; fill: var(--c-muted); }
+      .label { font: 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: var(--c-soft); }
+      .box-text { font: 600 14px ui-monospace, Consolas, monospace; fill: var(--c-text); }
+      .hint { font: 12px 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; fill: var(--c-hint); }
+      .panel { fill: var(--c-panel); stroke: var(--c-panel-stroke); stroke-width: 1.5; }
+      .slot { fill: var(--c-teal-fill); stroke: var(--c-teal); stroke-width: 2; }
+      .obj { fill: var(--c-orange-fill); stroke: var(--c-orange); stroke-width: 2; }
+      .null-slot { fill: var(--c-null-fill); stroke: var(--c-null-stroke); stroke-width: 2; stroke-dasharray: 6 4; }
     ]]></style>
   </defs>
   <rect class="panel" x="16" y="16" width="688" height="140" rx="12"/>
@@ -29,7 +81,7 @@
   <text class="code" x="36" y="228">Integer boxed = 42;  // 自动装箱 ≈ Integer.valueOf(42)</text>
   <rect class="slot" x="36" y="252" width="120" height="56" rx="8"/>
   <text class="box-text" x="62" y="286">引用</text>
-  <line x1="156" y1="280" x2="280" y2="280" stroke="#0f766e" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <line x1="156" y1="280" x2="280" y2="280" stroke="var(--c-teal)" stroke-width="2.5" marker-end="url(#arrow)"/>
   <rect class="obj" x="290" y="244" width="200" height="72" rx="8"/>
   <text class="box-text" x="318" y="274">Integer 对象</text>
   <text class="label" x="318" y="298">内部值 = 42</text>

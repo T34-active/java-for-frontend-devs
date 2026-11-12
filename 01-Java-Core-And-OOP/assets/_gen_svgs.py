@@ -171,3 +171,11 @@ for name, content in files.items():
     text = path.read_text(encoding="utf-8")
     assert "基本" in text or "拆箱" in text or "集合" in text or "写代码" in text, name
     print("wrote", name)
+
+# 统一注入暗色 CSS 变量（与站点黑夜模式对齐）
+from _patch_svg_dark import patch_svg  # noqa: E402
+
+for name in files:
+    path = root / name
+    path.write_text(patch_svg(path.read_text(encoding="utf-8")), encoding="utf-8")
+    print("dark-patched", name)

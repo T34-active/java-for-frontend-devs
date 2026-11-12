@@ -1,13 +1,15 @@
 # 4. 泛型
 
-本章讨论 Java 泛型：为什么需要它、如何声明泛型类与方法、通配符与 PECS、类型擦除带来的限制，以及边界和数组的差异。
+本章讨论 Java <Term id="generics" />：为什么需要它、如何声明泛型类与方法、<Term id="wildcard" />与 <Term id="pecs" />、<Term id="type-erasure" />带来的限制，以及边界和数组的差异。带点状下划线的词可点开释义，见 [术语表](./glossary.md)。
 
 对应代码：[`GenericsDemo.java`](./src/main/java/com/jffd/core/generics/GenericsDemo.java)
+
+深度对齐吸收自 [JavaGuide · 泛型与通配符](https://javaguide.cn/java/basis/generics-and-wildcards.html)，已按本仓库节奏重写（Apache-2.0）。
 
 | | |
 |--|--|
 | 前置 | 会写 `List<String>`；知道类型参数必须是引用类型（第 1、3 章）。 |
-| 学完应能 | 声明泛型类/方法；用 PECS 读/写通配符；解释类型擦除及不能 `new T()` / `List<int>` 的原因。 |
+| 学完应能 | 声明泛型类/方法；用 PECS 读/写通配符；解释类型擦除及不能 `new T()` / `List<int>` 的原因；说出 JSON/`TypeReference` 为何要补运行时信息。 |
 
 本章把「泛型本身」拆开讲清楚，按顺序读。
 
@@ -122,6 +124,8 @@ static void fill(List<? super Integer> sink) {
 口诀：**PECS** — Producer Extends，Consumer Super。  
 需要「读一堆 Number 子类型」用 `? extends`；需要「写入 Integer」用 `? super`。
 
+记法对照前端：TS 里协变/逆变写在类型参数位置上；Java 默认不变，只能用通配符在**使用处**打开有限的读/写灵活度。不要指望 `List<Dog>` 直接当 `List<Animal>` 用。
+
 ---
 
 ## 4.4 类型擦除
@@ -133,10 +137,12 @@ static void fill(List<? super Integer> sink) {
 因此有一批硬限制：
 
 - 不能 `new T()`、`new T[10]`  
-- 不能写 `List<String>.class`  
+- 不能写 `List<String>.class`（没有「带参数的 Class 字面量」）  
 - 不能 `catch (T e)`  
 - 运行时不能可靠地做 `instanceof List<String>`  
-- 不能写 `List<int>`：类型参数必须是引用类型（见 [第 1 章](./01-strong-typing-and-basics.md#11-基本类型与包装类型)）
+- 不能写 `List<int>`：类型参数必须是引用类型（见 [第 1 章](./01-strong-typing-and-basics.md)）
+
+历史因果：泛型加入前集合只装 `Object`；为兼容旧字节码采用擦除，而不是像部分语言那样保留完整运行时泛型。
 
 需要在运行时知道具体类型时，常把 `Class<T>` 当作令牌传入：
 
@@ -147,9 +153,9 @@ public static <T> T create(Class<T> type) throws Exception {
 String s = create(String.class);
 ```
 
-JSON 反序列化泛型时，框架常用 `TypeReference<List<User>>` 之类手段补回运行时信息（模块三再细讲）。
+JSON 反序列化泛型时，框架常用 `TypeReference<List<User>>`（Jackson）之类手段，靠匿名子类保留泛型签名，补回运行时信息（模块三再细讲）。这是擦除在后端最常见的「必须绕一下」的地方。
 
-桥接方法：擦除后为了保持多态，编译器可能生成合成方法。面试提到「擦除 + 桥接」即可。
+桥接方法：擦除后为了保持多态，编译器可能生成合成方法。面试提到「擦除 + 桥接」即可，不必背字节码细节。
 
 ---
 
@@ -220,11 +226,13 @@ mvn -pl 01-Java-Core-And-OOP exec:java -Dexec.mainClass="com.jffd.core.generics.
 
 ## 面试（可选）
 
-- 什么是类型擦除？有哪些限制？  
+- 什么是类型擦除？有哪些限制？为何不能 `List<int>`？  
 - `? extends` 与 `? super`？PECS？  
 - 泛型与数组的差异？  
-- 如何获取泛型的运行时类型信息？  
+- 如何获取泛型的运行时类型信息？（`Class<T>` / `TypeReference`）  
 - 桥接方法是什么？（加分）
+
+参考：[JavaGuide · 泛型与通配符](https://javaguide.cn/java/basis/generics-and-wildcards.html)
 
 ## 小结
 

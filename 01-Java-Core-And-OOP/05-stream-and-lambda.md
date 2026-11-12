@@ -1,13 +1,15 @@
 # 5. Stream 与 Lambda
 
-本章讨论 Java 的 Lambda、函数式接口，以及 Stream 管道：中间操作与终端操作、惰性求值、`collect`、`map`/`flatMap`，还有并行流的适用边界。
+本章讨论 Java 的 <Term id="lambda" />、函数式接口，以及 <Term id="stream" /> 管道：中间操作与终端操作、<Term id="lazy" />、`collect`、`map`/`flatMap`，还有并行流的适用边界。带点状下划线的词可点开释义，见 [术语表](./glossary.md)。
 
 对应代码：[`StreamDemo.java`](./src/main/java/com/jffd/core/stream/StreamDemo.java)
+
+常见误用与考点对齐吸收自 JavaGuide 集合 / Java 8 相关篇目与生产踩坑，已按本仓库节奏重写。
 
 | | |
 |--|--|
 | 前置 | 会写 `for` 与集合遍历；第 3–4 章的 `List` / 泛型基础。 |
-| 学完应能 | 写出 filter/map/collect 管道；区分中间与终端操作；说明 Stream 不可复用；知道何时不要用 `parallelStream`。 |
+| 学完应能 | 写出 filter/map/collect 管道；解释惰性与短路；说明 Stream 不可复用；知道何时不要用 `parallelStream`；处理 Lambda 里的受检异常。 |
 
 若写过数组的 `map`/`filter` 会更容易上手，仍请按顺序建立 Java Stream 自己的规则。
 
@@ -67,8 +69,10 @@ List<String> result = users.stream()
 先记住三条规则：
 
 1. Stream **用过就废**，不能像集合那样反复拿来 `map`。  
-2. **中间操作惰性**，遇到终端操作才开始算。  
+2. **中间操作惰性**：只声明「打算怎么处理」，遇到**终端操作**才真正拉数据、做计算。  
 3. `parallelStream()` 使用多线程并行，不是「随便加点速度」的开关。
+
+惰性带来的好处：后面的 `findFirst` / `anyMatch` 可以**短路**，不必扫完全表。坏处：你在中间操作里偷偷打日志 / 写库，时机会变乱——所以中间操作应尽量纯。
 
 ---
 
@@ -96,7 +100,7 @@ List.of(1, 2, 3, 4, 5).stream()
 
 ## 5.4 `collect` 与 Collectors
 
-把流收成集合、字符串或分组结果，常用 **`collect`** 和 **`Collectors`**。
+把流收成集合、字符串或分组结果，常用 **`collect`** 和 **`Collectors`**。这是业务代码里最常见的「收口」。
 
 ```java
 Map<String, Long> countByDept = emps.stream()
@@ -111,6 +115,8 @@ String csv = emps.stream()
 ```
 
 `groupingBy` 负责按某个键分组，后面可以再接下游收集器做计数、求和等。报表、列表转 Map 时经常用到。
+
+注意：`Collectors.toMap(key, value)` 在 **value 为 null** 时会 NPE；key 冲突未提供 merge 函数时会抛异常。列表字段可能为空时，先过滤或改用更安全的收集方式。
 
 ---
 
@@ -151,9 +157,16 @@ List<String> ok = list.parallelStream().map(String::trim).toList();
 
 ## 5.7 调试与受检异常
 
+Lambda / 方法引用里**不能直接抛受检异常**（除非函数式接口签名本身声明了 `throws`，而标准 `Function` 等没有）。因此 `Files.readString` 这类调用常编不过。
+
+常见处理：
+
+1. 改回普通 `for`（最清晰）。  
+2. 在 Lambda 内 `try/catch`，包装成未受检异常再抛出。  
+3. 抽成小工具方法统一包装（团队约定）。
+
 - 管道难跟时，可临时 `peek(System.out::println)`。  
-- Lambda 里抛出**受检异常**往往编不过：抽到普通循环，或包装成未受检异常（见第 6 章）。  
-- 同一个 Stream 使用两次会抛 `IllegalStateException`：先收集成 `List`，再多次处理。
+- 同一个 Stream 使用两次会抛 `IllegalStateException`：先收集成 `List`，再多次处理（见第 6 章对受检异常包装的补充）。
 
 ```java
 var stream = list.stream().map(String::trim);
@@ -195,11 +208,14 @@ mvn -pl 01-Java-Core-And-OOP exec:java -Dexec.mainClass="com.jffd.core.stream.St
 
 ## 面试（可选）
 
-- 中间操作与终端操作？惰性求值？  
+- 中间操作与终端操作？惰性求值与短路？  
 - `map` 与 `flatMap`？  
 - 并行流原理与适用 / 禁用场景？  
-- Lambda 与匿名内部类在 `this`、变量捕获上的差别？  
+- Lambda 里如何处理受检异常？  
+- `Collectors.toMap` 的 null value / 重复 key 问题？  
 - `Collectors.toList()` 与 `.toList()` 的差异？
+
+参考：[JavaGuide · Java 8 新特性](https://javaguide.cn/java/new-features/java8-tutorial-translate.html)、[集合使用注意事项](https://javaguide.cn/java/collection/java-collection-precautions-for-use.html)
 
 ## 小结
 

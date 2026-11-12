@@ -1,0 +1,86 @@
+/**
+ * SVG 作为 <img> 嵌入时，内部 @media (prefers-color-scheme)
+ * 会跟随引用元素的 color-scheme（Chromium / Safari / 新版 Firefox）。
+ * 这样 VitePress 手动切换黑夜模式时，图也能跟着变。
+ */
+.vp-doc img[src$='.svg'] {
+  color-scheme: light;
+  border-radius: 8px;
+}
+
+html.dark .vp-doc img[src$='.svg'] {
+  color-scheme: dark;
+}
+
+/* 行内术语：点按弹出释义（类「高性价比人生指南」CI 提示） */
+.term-tip {
+  position: relative;
+  display: inline;
+}
+
+.term-tip__trigger {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: var(--vp-c-brand-1);
+  cursor: help;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+.term-tip__trigger:hover,
+.term-tip.is-open .term-tip__trigger {
+  color: var(--vp-c-brand-2);
+}
+
+.term-tip__trigger.is-strong {
+  font-weight: 700;
+}
+
+.term-tip__pop {
+  position: absolute;
+  z-index: 40;
+  left: 0;
+  top: calc(100% + 8px);
+  width: min(320px, 72vw);
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg-elv);
+  box-shadow: var(--vp-shadow-3);
+  text-align: left;
+  line-height: 1.55;
+  white-space: normal;
+}
+
+.term-tip__title {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--vp-c-text-1);
+}
+
+.term-tip__def {
+  display: block;
+  font-size: 13px;
+  color: var(--vp-c-text-2);
+}
+
+.term-tip__more {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--vp-c-brand-1);
+}
+
+.term-tip--missing {
+  text-decoration: underline wavy;
+  text-decoration-color: var(--vp-c-danger-1);
+}

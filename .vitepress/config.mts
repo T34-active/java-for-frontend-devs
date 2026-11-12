@@ -40,6 +40,7 @@ export default defineConfig({
           collapsed: false,
           items: [
             { text: '模块导读', link: '/01-Java-Core-And-OOP/' },
+            { text: '术语表', link: '/01-Java-Core-And-OOP/glossary' },
             { text: '0. 安装 JDK 与工具链', link: '/01-Java-Core-And-OOP/00-install-jdk-and-toolchain' },
             { text: '1. 强类型与基础语法', link: '/01-Java-Core-And-OOP/01-strong-typing-and-basics' },
             { text: '2. 面向对象深挖', link: '/01-Java-Core-And-OOP/02-oop-deep-dive' },
