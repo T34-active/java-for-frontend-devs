@@ -8,6 +8,8 @@ export default defineConfig({
   title: 'Java For Frontend Devs',
   description: '前端工程师转 Java 全栈的系统化学习手册',
   lang: 'zh-CN',
+  // GitHub Pages 项目站路径：https://t34-active.github.io/java-for-frontend-devs/
+  base: '/java-for-frontend-devs/',
   cleanUrls: true,
   // 文档就在仓库根下的各模块目录里
   srcDir: '.',
@@ -122,5 +124,8 @@ export default defineConfig({
     returnToTopLabel: '回到顶部',
     sidebarMenuLabel: '菜单',
     darkModeSwitchLabel: '主题',
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/T34-active/java-for-frontend-devs' },
+    ],
   },
 })
