@@ -26,7 +26,8 @@ npm run docs:dev      # http://localhost:6100（勿用 6000，Chrome 会 ERR_UNS
 npm run docs:build    # 输出到 .vitepress/dist
 ```
 
-推到 `main` 后，GitHub Actions 会自动构建并发布到上面的 Pages 地址。
+在线站由仓库根目录 `docs/`（VitePress 构建产物）经 GitHub Pages 发布。  
+改文档后本地执行 `npm run docs:build`，把 `.vitepress/dist` 同步进 `docs/` 再推送 `main`。
 
 ## 你会学到什么
 
