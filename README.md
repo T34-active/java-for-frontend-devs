@@ -26,8 +26,16 @@ npm run docs:dev      # http://localhost:6100（勿用 6000，Chrome 会 ERR_UNS
 npm run docs:build    # 输出到 .vitepress/dist
 ```
 
-在线站由仓库根目录 `docs/`（VitePress 构建产物）经 GitHub Pages 发布。  
-改文档后本地执行 `npm run docs:build`，把 `.vitepress/dist` 同步进 `docs/` 再推送 `main`。
+## 协作与流水线
+
+推荐流程：**开分支 → 提 PR → 等 CI 绿灯 → 你自己合并 `main`**。
+
+| 时机 | 流水线 | 做什么 |
+|------|--------|--------|
+| 打开 / 更新 PR | `CI` | 构建 VitePress；编译模块一 Java Demo |
+| 合并进 `main`（或手动触发） | `Deploy docs` | 构建文档并发布到 GitHub Pages |
+
+合并后几分钟内更新：https://t34-active.github.io/java-for-frontend-devs/
 
 ## 你会学到什么
 
